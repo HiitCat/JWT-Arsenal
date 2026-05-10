@@ -1,65 +1,351 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import React from "react";
+import Link from "next/link";
+import { Icon } from "@/components/shared/Icons";
+import { PageContainer } from "@/components/layout/PageContainer";
+import { GlowCard, hexToRgb } from "@/components/shared/GlowCard";
+import { ExternalLink } from "lucide-react";
+
+const techniques = [
+  {
+    href: "/exploit/unverified-signature",
+    name: "Unverified Signature",
+    description: "Server accepts tokens without verifying the signature - modify any claim freely.",
+    icon: Icon.Eye,
+    color: "#06b6d4",
+  },
+  {
+    href: "/exploit/alg-none",
+    name: "Algorithm None",
+    description: 'Set alg to "none" and strip the signature - server accepts the unsigned token.',
+    icon: Icon.AlertTriangle,
+    color: "#f59e0b",
+  },
+  {
+    href: "/exploit/algorithm-confusion",
+    name: "Algorithm Confusion",
+    description: "Server uses RS256 but accepts HS256 - sign with the public key as HMAC secret.",
+    icon: Icon.Zap,
+    color: "#a78bfa",
+  },
+  {
+    href: "/exploit/kid-injection",
+    name: "KID Injection",
+    description: "Inject path traversal or SQL into the kid header to control which key is used.",
+    icon: Icon.Key,
+    color: "#ef4444",
+  },
+  {
+    href: "/exploit/jwk-injection",
+    name: "JWK Injection",
+    description: "Embed your own public JWK in the header - server uses it to verify your forged token.",
+    icon: Icon.FileKey,
+    color: "#ec4899",
+  },
+  {
+    href: "/exploit/jku-injection",
+    name: "JKU Injection",
+    description: "Point JKU to an attacker-controlled JWKS endpoint to supply your own signing key.",
+    icon: Icon.Globe,
+    color: "#3b82f6",
+  },
+  {
+    href: "/exploit/public-key-recovery",
+    name: "Public Key Recovery",
+    description: "Recover the RSA public key from two signatures, then perform algorithm confusion.",
+    icon: Icon.Lock,
+    color: "#22c55e",
+  },
+];
+
+export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <PageContainer>
+      {/* Hero */}
+      <div
+        style={{
+          padding: "56px 0 40px",
+          borderBottom: "1px solid var(--border)",
+          marginBottom: "48px",
+          position: "relative",
+        }}
+      >
+        <h1
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            fontSize: "40px",
+            fontWeight: 700,
+            lineHeight: 1.15,
+            margin: "0 0 12px",
+            fontFamily: "var(--font-mono)",
+            letterSpacing: "-0.03em",
+          }}
+        >
+          <span style={{ display: "inline-flex", color: "var(--accent)", flexShrink: 0 }}>
+            <Icon.Logo size={32} />
+          </span>
+          <span
+            style={{
+              display: "inline-block",
+              background: "var(--gradient-logo)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
+            JWT Arsenal
+          </span>
+        </h1>
+
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "6px",
+            padding: "4px 12px",
+            background: "var(--success-tint)",
+            border: "1px solid var(--success-border)",
+            borderRadius: "100px",
+            fontSize: "12px",
+            color: "var(--success)",
+            fontWeight: 500,
+            marginBottom: "16px",
+          }}
+        >
+          <Icon.Lock size={11} />
+          100% client-side · No data leaves your browser
+        </div>
+
+        <p
+          style={{
+            fontSize: "16px",
+            color: "var(--text-muted)",
+            maxWidth: "560px",
+            lineHeight: 1.7,
+            margin: "0 0 32px",
+          }}
+        >
+          A client-side JWT exploitation toolkit for pentesters, bug bounty hunters, and CTF players.
+          Inspect tokens, forge exploits, and understand JWT vulnerabilities - all in your browser.
+        </p>
+        <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+          <Link
+            href="/inspect"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              height: "40px",
+              padding: "0 20px",
+              background: "var(--accent)",
+              color: "var(--bg)",
+              borderRadius: "var(--radius)",
+              textDecoration: "none",
+              fontSize: "14px",
+              fontWeight: 600,
+              boxShadow: "0 0 20px var(--accent-border-mid)",
+            }}
+          >
+            <Icon.Search size={14} />
+            Inspect a JWT
+          </Link>
+          <Link
+            href="/cheatsheet"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              height: "40px",
+              padding: "0 16px",
+              background: "transparent",
+              color: "var(--text-muted)",
+              border: "1px solid var(--border)",
+              borderRadius: "var(--radius)",
+              textDecoration: "none",
+              fontSize: "14px",
+              fontWeight: 500,
+            }}
+          >
+            <Icon.Terminal size={14} />
+            CLI Cheatsheet
+          </Link>
+          <Link
+            href="/knowledge-base"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              height: "40px",
+              padding: "0 16px",
+              background: "transparent",
+              color: "var(--text-muted)",
+              border: "1px solid var(--border)",
+              borderRadius: "var(--radius)",
+              textDecoration: "none",
+              fontSize: "14px",
+              fontWeight: 500,
+            }}
+          >
+            <Icon.BookOpen size={14} />
+            Knowledge Base
+          </Link>
+        </div>
+      </div>
+
+      {/* Techniques grid */}
+      <div style={{ marginBottom: "48px", borderBottom: "1px solid var(--border)", paddingBottom: "48px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
+          <h2 style={{ fontSize: "20px", fontWeight: 600, color: "var(--text)", margin: 0 }}>
+            Exploitation Techniques
+          </h2>
+          <span
+            style={{
+              fontSize: "11px",
+              fontFamily: "var(--font-mono)",
+              color: "var(--text-muted)",
+              background: "var(--bg-elevated)",
+              border: "1px solid var(--border)",
+              padding: "2px 8px",
+              borderRadius: "100px",
+            }}
+          >
+            {techniques.length} attacks
+          </span>
+        </div>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+            gap: "12px",
+          }}
+        >
+          {techniques.map((t) => (
+            <TechniqueCard key={t.href} {...t} />
+          ))}
+        </div>
+      </div>
+
+      {/* Why section */}
+      <div
+        style={{
+          padding: "32px",
+          background: "var(--bg-elevated)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--radius)",
+          marginBottom: "32px",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            width: "300px",
+            height: "200px",
+            background: "radial-gradient(ellipse at top right, var(--accent-subtle) 0%, transparent 70%)",
+            pointerEvents: "none",
+          }}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+        <h2 style={{ fontSize: "20px", fontWeight: 600, color: "var(--text)", marginBottom: "16px" }}>
+          Why JWT Arsenal?
+        </h2>
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px", maxWidth: "100%" }}>
+          <p style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: 1.7, margin: 0 }}>
+            <a href="https://jwt.io" target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent)", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            jwt.io<ExternalLink size={11} /></a>{" "}is great for decoding, but it
+            doesn&apos;t help you exploit.</p>
+          <p style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: 1.7, margin: 0 }}>
+            Every JWT exploitation tool you&apos;ll find is CLI-only -{" "}
+            <a href="https://github.com/ticarpi/jwt_tool" target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent)", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            jwt_tool<ExternalLink size={11} /></a>
+            {", "}
+            <a href="https://github.com/hashcat/hashcat" target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent)", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            hashcat<ExternalLink size={11} /></a>, or custom Python scripts. There&apos;s no browser-based UI for forging attack-specific tokens.
+          </p>
+          <p style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: 1.7, margin: 0 }}>
+            JWT Arsenal fills that gap. Every cryptographic operation runs in your browser using the Web
+            Crypto API. No token, key, or payload ever leaves your machine.
+          </p>
+          <p style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: 1.7, margin: 0 }}>
+            For operations too heavy for the browser (brute-force, GCD-based key recovery), JWT Arsenal
+            provides ready-to-paste CLI commands in the{" "}
+            <a href="/cheatsheet" style={{ color: "var(--accent)", display: "inline-flex", alignItems: "center", gap: "4px" }}>Cheatsheet<ExternalLink size={11} /></a>
+            {" "}and deep technical context in the{" "}
+            <a href="/knowledge-base" style={{ color: "var(--accent)", display: "inline-flex", alignItems: "center", gap: "4px" }}>Knowledge Base<ExternalLink size={11} /></a>.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </div>
+
+      {/* Inspect CTA */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "24px 32px",
+          background: "linear-gradient(135deg, var(--accent-faint) 0%, var(--accent-subtle) 100%)",
+          border: "1px solid var(--accent-border)",
+          borderRadius: "var(--radius)",
+          flexWrap: "wrap",
+          gap: "16px",
+          boxShadow: "inset 0 1px 0 var(--surface-overlay-hover)",
+        }}
+      >
+        <div>
+          <div style={{ fontSize: "16px", fontWeight: 600, color: "var(--text)", marginBottom: "4px" }}>
+            Start by inspecting a token
+          </div>
+          <div style={{ fontSize: "14px", color: "var(--text-muted)" }}>
+            Decode headers, claims, and timestamps - then send it to any exploit page.
+          </div>
         </div>
-      </main>
-    </div>
+        <Link
+          href="/inspect"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            height: "40px",
+            padding: "0 20px",
+            background: "var(--accent)",
+            color: "var(--bg)",
+            borderRadius: "var(--radius)",
+            textDecoration: "none",
+            fontSize: "14px",
+            fontWeight: 600,
+            flexShrink: 0,
+            boxShadow: "0 0 16px var(--accent-border)",
+          }}
+        >
+          Open Inspector <Icon.ChevronRight size={14} />
+        </Link>
+      </div>
+    </PageContainer>
+  );
+}
+
+function TechniqueCard({ href, name, description, icon: CardIcon, color }: {
+  href: string;
+  name: string;
+  description: string;
+  icon: (p: { size?: number }) => React.ReactElement;
+  color: string;
+}) {
+  const rgb = hexToRgb(color);
+  return (
+    <GlowCard color={color} href={href} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "20px" }}>
+      <div style={{ width: "34px", height: "34px", borderRadius: "8px", background: `rgba(${rgb}, 0.12)`, border: `1px solid rgba(${rgb}, 0.25)`, display: "flex", alignItems: "center", justifyContent: "center", color, flexShrink: 0 }}>
+        <CardIcon size={15} />
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <h3 style={{ fontSize: "14px", fontWeight: 600, color: "var(--text)", margin: "0 0 6px" }}>{name}</h3>
+        <p style={{ fontSize: "12px", color: "var(--text-muted)", lineHeight: 1.65, margin: 0 }}>{description}</p>
+      </div>
+    </GlowCard>
   );
 }

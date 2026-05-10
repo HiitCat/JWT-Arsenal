@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# JWT Arsenal
+
+A 100% client-side JWT offensive toolkit for pentesters, bug bounty hunters, and CTF players.
+
+> **Legal**: Use only against systems you have explicit written authorization to test. CTF environments, authorized pentests, and security research only.
+
+## Features
+
+- **Inspect** - Decode any JWT: header, payload, signature, timing claims
+- **Unverified Signature** - Forge tokens the server accepts without signature verification
+- **Algorithm None** - Strip the signature; test all casing variants (`none`, `None`, `NONE`, `nOnE`)
+- **Algorithm Confusion** - RS256 → HS256 using the public key as HMAC secret
+- **KID Injection** - Path traversal or SQL injection via the `kid` header
+- **JWK Injection** - Embed attacker-controlled public key in the JWT header
+- **JKU Injection** - Point `jku` to attacker-controlled JWKS endpoint
+- **Public Key Recovery** - CLI guide for `rsa_sign2n` + algorithm confusion workflow
+- **CLI Cheatsheet** - Ready-to-paste hashcat, john, jwt_tool commands
+
+All cryptographic operations run in the browser via Web Crypto API. No token, key, or payload is ever transmitted to any server. No analytics, no CDN, no external dependencies at runtime.
+
+## Tech Stack
+
+- Next.js 14 (App Router, `output: 'export'`)
+- TypeScript strict
+- Tailwind CSS
+- Web Crypto API
+- `jose`, `lucide-react`, `@fontsource`
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# → http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Build
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build
+# Outputs static files to /out
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Deploy
 
-## Learn More
+### Vercel
 
-To learn more about Next.js, take a look at the following resources:
+Push to GitHub and import the repository in Vercel. No environment variables needed.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Cloudflare Pages
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run build
+# Upload the /out directory to Cloudflare Pages
+```
 
-## Deploy on Vercel
+### Self-hosted (static)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run build
+# Serve the /out directory with any static file server:
+npx serve out
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project Structure
+
+```
+app/                     # Next.js App Router pages
+├── page.tsx             # Home - technique grid
+├── inspect/             # JWT decoder
+├── exploit/             # 7 exploitation technique pages
+│   ├── unverified-signature/
+│   ├── alg-none/
+│   ├── algorithm-confusion/
+│   ├── kid-injection/
+│   ├── jwk-injection/
+│   ├── jku-injection/
+│   └── public-key-recovery/
+├── cheatsheet/          # CLI command reference
+└── about/               # Legal disclaimer + credits
+
+lib/                     # Cryptographic utilities
+├── jwt.ts               # Encode/decode/forge helpers
+├── crypto.ts            # Web Crypto API wrappers (RSA, HMAC)
+├── pem.ts               # PEM parsing/validation
+└── jwk.ts               # JWK helpers + JWKS generation
+
+components/
+├── layout/              # Sidebar, PageContainer, ExploitLayout
+├── jwt/                 # JwtInput, JwtOutput, PayloadEditor, KeyInput
+└── shared/              # CodeBlock, InfoCallout, StepCard
+```
+
+## No Secrets
+
+The project contains no `.env` file, no API keys, no secrets of any kind. All operations are client-side.
