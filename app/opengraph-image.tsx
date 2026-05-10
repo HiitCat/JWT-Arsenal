@@ -107,7 +107,7 @@ export default function OgImage() {
             lineHeight: 1.4,
           }}>
             Forge, inspect &amp; exploit JWT vulnerabilities
-            <br />directly in your browser - no backend needed.
+            <br />directly in your browser.
           </div>
 
           {/* Badges */}
@@ -165,16 +165,6 @@ export default function OgImage() {
               </span>
             </div>
           ))}
-        </div>
-
-        {/* Bottom URL */}
-        <div style={{
-          position: "absolute", bottom: "28px", right: "64px",
-          fontSize: "14px", fontWeight: 400,
-          color: "#3f3f46",
-          display: "flex",
-        }}>
-          jwtarsenal.com
         </div>
       </div>
     ),
