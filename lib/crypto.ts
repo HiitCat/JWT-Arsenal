@@ -37,9 +37,13 @@ export async function generateRsaKeyPair(): Promise<RsaKeyPair> {
 }
 
 export async function signHmacSha256(data: string, keyBytes: Uint8Array): Promise<Uint8Array> {
+  // WebCrypto rejects empty keys; HMAC pads keys shorter than block size with zeros (64 bytes for SHA-256)
+  const keyData = keyBytes.byteLength === 0
+    ? new Uint8Array(64).buffer
+    : keyBytes.buffer.slice(keyBytes.byteOffset, keyBytes.byteOffset + keyBytes.byteLength) as ArrayBuffer;
   const key = await crypto.subtle.importKey(
     "raw",
-    keyBytes.buffer.slice(keyBytes.byteOffset, keyBytes.byteOffset + keyBytes.byteLength) as ArrayBuffer,
+    keyData,
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"]
@@ -207,10 +211,9 @@ export async function verifyHmacSignature(
   if (alg === "HS384") hashAlg = "SHA-384";
   if (alg === "HS512") hashAlg = "SHA-512";
 
-  const keyMaterial = secretBytes.buffer.slice(
-    secretBytes.byteOffset,
-    secretBytes.byteOffset + secretBytes.byteLength
-  ) as ArrayBuffer;
+  const keyMaterial = secretBytes.byteLength === 0
+    ? new Uint8Array(64).buffer
+    : secretBytes.buffer.slice(secretBytes.byteOffset, secretBytes.byteOffset + secretBytes.byteLength) as ArrayBuffer;
 
   const key = await crypto.subtle.importKey(
     "raw",

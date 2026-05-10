@@ -1,0 +1,12 @@
+{
+  "keys": [
+    {
+      "kty": "RSA",
+      "use": "sig",
+      "alg": "RS256",
+      "kid": "jwt-arsenal-1",
+      "n": "rHidgESfqG_BZfrZCRpNObC9cKVaHzUo-p_jM6yK3InsO4vjjktl2EIKFM-3symCtmNOdSfIqRZt5fOQqHsj-qRgf01Mee4zAv5zXWmwR1XxUI0_wwCgqFEgbgjxJQYVu6BVuuFVaQt3YzBxgk7LPKGzP2ezUG-s5epe5THqnG17NGzugxpYly8ztpouMdd757ivVhtFY4eR8MbOLs5IX7zMJklTZPaLDX2UooW-IqwZRQIXJn_WW9caw9L5woA3vMXrzWAkKox3iX1838cXe9J_IOZjn6frMpA4hoq6xElL6dbQNyLMedM-lsOMVt2_8Qgk2vPCxI-0lQn2oxPDJw",
+      "e": "AQAB"
+    }
+  ]
+}
