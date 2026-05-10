@@ -74,7 +74,7 @@ Ready-to-copy commands for `hashcat` (GPU cracking), `jwt_tool`, `rsa_sign2n`, a
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-username/jwt-arsenal.git
+git clone https://github.com/HiitCat/jwt-arsenal.git
 cd jwt-arsenal
 
 # Install dependencies
@@ -181,7 +181,7 @@ The project is actively maintained. Planned additions:
 - [ ] Additional KB articles - `x5u`, `x5c`, JWT confusion chains, ECDSA nonce reuse
 - [ ] Translations - French 🇫🇷
 
-Have an idea? [Open an issue](https://github.com/your-username/jwt-arsenal/issues) - all suggestions are welcome.
+Have an idea? [Open an issue](https://github.com/HiitCat/jwt-arsenal/issues) - all suggestions are welcome.
 
 ---
 
