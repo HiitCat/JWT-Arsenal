@@ -1,6 +1,6 @@
 export const SITE_URL         = "https://jwtarsenal.com";
 export const SITE_NAME        = "JWT Arsenal";
-export const SITE_DESCRIPTION = "100% client-side JWT exploitation toolkit for pentesters, CTF players and bug bounty hunters. Forge, inspect and exploit JWT vulnerabilities directly in your browser.";
+export const SITE_DESCRIPTION = "100% client-side JWT exploitation toolkit for pentesters, CTF players and bug bounty hunters. Forge, inspect and exploit JWT vulnerabilities directly in your browser. 🚀";
 export const OG_IMAGE         = `${SITE_URL}/opengraph-image`;
 
 /** Build a page-level title: "Page Name | JWT Arsenal" */
