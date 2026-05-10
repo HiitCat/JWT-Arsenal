@@ -5,6 +5,7 @@ import { CodeBlock } from "@/components/shared/CodeBlock";
 import { InfoCallout } from "@/components/shared/InfoCallout";
 import "../globals.css";
 import { Mono } from "@/components/shared/Mono";
+import { ExternalLink } from "lucide-react";
 
 export const metadata: Metadata = pageMeta(
   "JWT Attack Cheatsheet",
@@ -194,9 +195,9 @@ export default function CheatsheetPage() {
                         href={toolUrls[e.tool]}
                         target="_blank"
                         rel="noopener noreferrer"
-                        style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--accent)", textDecoration: "none" }}
+                        style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--accent)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px" }}
                       >
-                        {e.tool}
+                        {e.tool} <ExternalLink size={11} />
                       </a>
                     ) : (
                       <Mono>
