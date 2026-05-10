@@ -20,7 +20,7 @@ const UNMOUNT_AT   = 2600;
 export function PageLoader() {
   const [mounted,  setMounted]  = useState(true);
   const [visible,  setVisible]  = useState(true);
-  const [title,    setTitle]    = useState(CHARS.slice(0, TITLE.length).split("").map(() => CHARS[Math.floor(Math.random() * CHARS.length)]).join(""));
+  const [title,    setTitle]    = useState(TITLE);
   const [lines,    setLines]    = useState<number[]>([]);
   const [progress, setProgress] = useState(0);
   const [cursor,   setCursor]   = useState(true);
