@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import { Icon } from "@/components/shared/Icons";
 
-const GITHUB_URL = "https://github.com/";
+const GITHUB_URL = "https://github.com/HiitCat/JWT-Arsenal";
 const LABEL = "GitHub";
 const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$!?<>/\\~^";
 const DURATION = 480;
