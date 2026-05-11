@@ -52,6 +52,10 @@ export default function InspectPage() {
   }, []);
 
   const expired = parsed ? isExpired(parsed.payload) : false;
+  const now = Math.floor(Date.now() / 1000);
+  const notYetValid = parsed
+    ? typeof parsed.payload.nbf === "number" && now < (parsed.payload.nbf as number)
+    : false;
 
   return (
     <PageContainer>
@@ -71,7 +75,7 @@ export default function InspectPage() {
             border: "1px solid var(--border)",
             borderRadius: "var(--radius)",
             padding: "24px",
-            marginBottom: "24px",
+            marginBottom: "16px",
           }}
         >
           <div style={{ marginBottom: "16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
@@ -106,27 +110,26 @@ export default function InspectPage() {
 
         {parsed && (
           <>
-            <div style={{ marginBottom: "24px" }}>
+            <div style={{ marginBottom: "16px" }}>
               <div
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  padding: "12px 16px",
-                  background: expired ? "var(--danger-tint)" : "var(--success-tint)",
-                  border: `1px solid ${expired ? "var(--danger-border-strong)" : "var(--success-border)"}`,
+                  padding: "10px 16px",
+                  background: expired ? "var(--danger-tint)" : notYetValid ? "rgba(245,158,11,0.06)" : "var(--success-tint)",
+                  border: `1px solid ${expired ? "var(--danger-border-strong)" : notYetValid ? "rgba(245,158,11,0.35)" : "var(--success-border)"}`,
                   borderRadius: "var(--radius)",
                 }}
               >
-                {expired ? <AlertCircle size={15} color="var(--danger)" /> : <CheckCircle size={15} color="var(--success)" />}
-                <span style={{ fontSize: "14px", fontWeight: 600, color: expired ? "var(--danger)" : "var(--success)" }}>
-                  {expired ? "Token is expired" : "Token timing is valid"}
-                </span>
-                {typeof parsed.payload.exp === "number" && (
-                  <span style={{ fontSize: "13px", color: "var(--text-muted)", marginLeft: "4px" }}>
-                    - exp: {formatTimestamp(parsed.payload.exp)}
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  {expired
+                    ? <AlertCircle size={15} color="var(--danger)" />
+                    : notYetValid
+                    ? <AlertCircle size={15} color="#f59e0b" />
+                    : <CheckCircle size={15} color="var(--success)" />}
+                  <span style={{ fontSize: "14px", fontWeight: 600, color: expired ? "var(--danger)" : notYetValid ? "#f59e0b" : "var(--success)", whiteSpace: "nowrap" }}>
+                    {expired ? "Token is expired" : notYetValid ? "Token not yet valid" : "Token timing is valid"}
                   </span>
-                )}
+                  <TimingTimeline payload={parsed.payload} />
+                </div>
               </div>
             </div>
 
@@ -135,7 +138,7 @@ export default function InspectPage() {
                 display: "grid",
                 gridTemplateColumns: "1fr 1fr 1fr",
                 gap: "16px",
-                marginBottom: "24px",
+                marginBottom: "16px",
               }}
             >
               <Section title="Header" accent={JWT_PART_COLORS.header}>
@@ -180,7 +183,7 @@ export default function InspectPage() {
                 background: "var(--bg-elevated)",
                 border: "1px solid var(--border)",
                 borderRadius: "var(--radius)",
-                padding: "24px",
+                padding: "16px",
               }}
             >
               <div style={{ fontSize: "14px", fontWeight: 500, color: "var(--text)", marginBottom: "16px" }}>
@@ -438,6 +441,82 @@ function SignatureVerifier({
           <ShieldQuestion size={13} /> Enter a secret to verify
         </div>
       )}
+    </div>
+  );
+}
+
+function TimingTimeline({ payload }: { payload: Record<string, unknown> }) {
+  const now = Math.floor(Date.now() / 1000);
+  const iat = typeof payload.iat === "number" ? payload.iat : null;
+  const nbf = typeof payload.nbf === "number" ? payload.nbf : null;
+  const exp = typeof payload.exp === "number" ? payload.exp : null;
+
+  const claimTs = [iat, nbf, exp].filter((t): t is number => t !== null);
+  if (claimTs.length === 0) return null;
+
+  const allTs = [...claimTs, now];
+  const minTs = Math.min(...allTs);
+  const maxTs = Math.max(...allTs);
+  const range = maxTs - minTs || 7200;
+  const pad = range * 0.15;
+  const start = minTs - pad;
+  const total = maxTs + pad - start;
+
+  const pct = (ts: number) => `${((ts - start) / total) * 100}%`;
+  const pctN = (ts: number) => ((ts - start) / total) * 100;
+
+  const isExpired = exp !== null && now > exp;
+  const isNotYetValid = nbf !== null && now < nbf;
+  const nowColor = isExpired ? "var(--danger)" : isNotYetValid ? "#f59e0b" : "var(--success)";
+
+  const validStart = nbf ?? iat ?? start;
+  const validEnd = exp ?? (maxTs + pad);
+  const validStartPct = pctN(validStart);
+  const validWidthPct = pctN(validEnd) - validStartPct;
+
+  const markers: Array<{ ts: number; label: string; color: string }> = [
+    iat !== null ? { ts: iat, label: "iat", color: "var(--text-muted)" } : null,
+    nbf !== null && nbf !== iat ? { ts: nbf, label: "nbf", color: "#f59e0b" } : null,
+    exp !== null ? { ts: exp, label: "exp", color: isExpired ? "var(--danger)" : "var(--success)" } : null,
+  ].filter((m): m is { ts: number; label: string; color: string } => m !== null);
+
+  const fmtTitle = (ts: number) => new Date(ts * 1000).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
+
+  // px layout: bar centered at CONTAINER_H/2
+  const CONTAINER_H = 40;
+  const BAR_H = 4;
+  const BAR_TOP = (CONTAINER_H - BAR_H) / 2; // 18 — bar center = 20 = container center
+  const TICK_TOP = BAR_TOP - 6;              // 12 — tick starts 6px above bar
+  const TICK_H = BAR_H + 12;                // 16 — tick ends 8px below bar
+
+  const fmtDate = (ts: number) =>
+    new Date(ts * 1000).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
+
+  return (
+    <div style={{ flex: 1, minWidth: 0, position: "relative", height: `${CONTAINER_H}px`, marginLeft: "12px" }}>
+      {/* Bar track */}
+      <div style={{ position: "absolute", left: 0, right: 0, top: `${BAR_TOP}px`, height: `${BAR_H}px`, borderRadius: "2px", background: "rgba(128,128,128,0.18)" }}>
+        <div style={{ position: "absolute", left: `${validStartPct}%`, width: `${Math.max(0, validWidthPct)}%`, top: 0, bottom: 0, background: "var(--success)", opacity: 0.28, borderRadius: "2px" }} />
+        {exp !== null && (
+          <div style={{ position: "absolute", left: pct(exp), right: 0, top: 0, bottom: 0, background: "var(--danger)", opacity: 0.22, borderRadius: "0 2px 2px 0" }} />
+        )}
+      </div>
+
+      {/* Claim markers */}
+      {markers.map((m) => (
+        <div key={m.label} style={{ position: "absolute", left: pct(m.ts), top: 0, bottom: 0, transform: "translateX(-50%)", pointerEvents: "none" }}>
+          <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", fontSize: "9px", fontWeight: 700, color: m.color, fontFamily: "var(--font-mono)", whiteSpace: "nowrap", lineHeight: 1 }}>{m.label}</div>
+          <div style={{ position: "absolute", top: `${TICK_TOP}px`, left: "50%", transform: "translateX(-50%)", width: "1.5px", height: `${TICK_H}px`, background: m.color, borderRadius: "1px" }} />
+          <div style={{ position: "absolute", bottom: 0, left: "50%", transform: "translateX(-50%)", fontSize: "9px", color: m.color, fontFamily: "var(--font-mono)", whiteSpace: "nowrap", lineHeight: 1, opacity: 0.8 }}>{fmtDate(m.ts)}</div>
+        </div>
+      ))}
+
+      {/* Now indicator */}
+      <div style={{ position: "absolute", left: pct(now), top: 0, bottom: 0, transform: "translateX(-50%)", pointerEvents: "none", zIndex: 1 }}>
+        <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", fontSize: "9px", fontWeight: 700, color: nowColor, fontFamily: "var(--font-mono)", whiteSpace: "nowrap", lineHeight: 1 }}>now</div>
+        <div style={{ position: "absolute", top: `${TICK_TOP - 1}px`, left: "50%", transform: "translateX(-50%)", width: 0, height: 0, borderLeft: "3px solid transparent", borderRight: "3px solid transparent", borderTop: `4px solid ${nowColor}` }} />
+        <div style={{ position: "absolute", top: `${TICK_TOP + 3}px`, left: "50%", transform: "translateX(-50%)", width: "2px", height: `${TICK_H - 3}px`, background: nowColor, borderRadius: "1px" }} />
+      </div>
     </div>
   );
 }
