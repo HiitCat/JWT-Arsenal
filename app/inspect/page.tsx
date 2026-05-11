@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import Link from "next/link";
+import { Link } from "@/components/shared/Link";
 import { Clock, CheckCircle, AlertCircle, ShieldCheck, ShieldX, ShieldQuestion } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { JwtInput } from "@/components/jwt/JwtInput";
@@ -11,18 +11,19 @@ import { Icon } from "@/components/shared/Icons";
 import { JwtParts, formatTimestamp, isExpired, STANDARD_CLAIMS } from "@/lib/jwt";
 import { verifyHmacSignature } from "@/lib/crypto";
 import { JWT_EXAMPLES } from "@/lib/jwtExamples";
+import { TOPIC_COLORS, JWT_PART_COLORS } from "@/lib/colors";
 import "../globals.css";
 import { Mono } from "@/components/shared/Mono";
 
 const DEFAULT_EXAMPLE = JWT_EXAMPLES.find((example) => example.alg === "HS256") ?? JWT_EXAMPLES[0];
 
 const EXPLOIT_PAGES = [
-  { href: "/exploit/unverified-signature", label: "Unverified Signature", icon: Icon.Eye, color: "#06b6d4" },
-  { href: "/exploit/alg-none", label: "Algorithm None", icon: Icon.AlertTriangle, color: "#f59e0b" },
-  { href: "/exploit/algorithm-confusion", label: "Algorithm Confusion", icon: Icon.Zap, color: "#84cc16" },
-  { href: "/exploit/kid-injection", label: "KID Injection", icon: Icon.Key, color: "#ef4444" },
-  { href: "/exploit/jwk-injection", label: "JWK Injection", icon: Icon.FileKey, color: "#ec4899" },
-  { href: "/exploit/jku-injection", label: "JKU Injection", icon: Icon.Globe, color: "#3b82f6" },
+  { href: "/exploit/unverified-signature", label: "Unverified Signature", icon: Icon.Eye, color: TOPIC_COLORS.unverifiedSignature },
+  { href: "/exploit/alg-none", label: "Algorithm None", icon: Icon.AlertTriangle, color: TOPIC_COLORS.algNone },
+  { href: "/exploit/algorithm-confusion", label: "Algorithm Confusion", icon: Icon.Zap, color: TOPIC_COLORS.algorithmConfusion },
+  { href: "/exploit/kid-injection", label: "KID Injection", icon: Icon.Key, color: TOPIC_COLORS.kidInjection },
+  { href: "/exploit/jwk-injection", label: "JWK Injection", icon: Icon.FileKey, color: TOPIC_COLORS.jwkInjection },
+  { href: "/exploit/jku-injection", label: "JKU Injection", icon: Icon.Globe, color: TOPIC_COLORS.jkuInjection },
 ];
 
 function hexToRgb(hex: string) {
@@ -137,7 +138,7 @@ export default function InspectPage() {
                 marginBottom: "24px",
               }}
             >
-              <Section title="Header" accent="#e06c75">
+              <Section title="Header" accent={JWT_PART_COLORS.header}>
                 <JsonDisplay obj={parsed.header} />
                 <div style={{ marginTop: "12px" }}>
                   <InfoRow label="Algorithm" value={String(parsed.header.alg ?? "-")} mono />
@@ -148,7 +149,7 @@ export default function InspectPage() {
                 </div>
               </Section>
 
-              <Section title="Payload" accent="#98c379">
+              <Section title="Payload" accent={JWT_PART_COLORS.payload}>
                 <JsonDisplay obj={parsed.payload} />
                 <div style={{ marginTop: "12px" }}>
                   {(STANDARD_CLAIMS as readonly string[]).map((claim) => {
@@ -169,7 +170,7 @@ export default function InspectPage() {
                 </div>
               </Section>
 
-              <Section title="Signature" accent="#61afef">
+              <Section title="Signature" accent={JWT_PART_COLORS.signature}>
                 <SignatureVerifier parsed={parsed} secret={secret} setSecret={setSecret} />
               </Section>
             </div>
@@ -195,7 +196,7 @@ export default function InspectPage() {
                 {EXPLOIT_PAGES.map((p) => {
                   const rgb = hexToRgb(p.color);
                   return (
-                    <Link
+                    <a
                       key={p.href}
                       href={`${p.href}?jwt=${encodeURIComponent(rawJwt)}`}
                       style={{
@@ -236,7 +237,7 @@ export default function InspectPage() {
                         {p.label}
                       </span>
                       <Icon.ChevronRight size={11} />
-                    </Link>
+                    </a>
                   );
                 })}
               </div>
@@ -327,9 +328,9 @@ function SignatureVerifier({
           Algorithm: <Mono>{alg || "unknown"}</Mono>
         </div>
         <InfoCallout variant="info">
-          Asymmetric algorithm - signature verification requires the server&apos;s public key.
+          Asymmetric algorithm - signature verification requires the server's public key.
           Use{" "}
-          <Link href="/exploit/algorithm-confusion" style={{ color: "var(--accent)" }}>
+          <Link href="/exploit/algorithm-confusion">
             Algorithm Confusion
           </Link>{" "}
           to work with RS256 tokens.
@@ -342,7 +343,7 @@ function SignatureVerifier({
             margin: 0,
             fontFamily: "var(--font-mono)",
             fontSize: "11px",
-            color: "#61afef",
+            color: JWT_PART_COLORS.signature,
             wordBreak: "break-all",
             lineHeight: 1.6,
             padding: "8px",
@@ -373,13 +374,13 @@ function SignatureVerifier({
       >
         <span style={{ color: "var(--text-muted)" }}>{algFnName}(</span>
         <div style={{ paddingLeft: "14px" }}>
-          <span style={{ color: "#e06c75" }}>base64UrlEncode(header)</span>
+          <span style={{ color: JWT_PART_COLORS.header }}>base64UrlEncode(header)</span>
           <span style={{ color: "var(--text-muted)" }}> + &quot;.&quot; +</span>
           <br />
-          <span style={{ color: "#98c379" }}>base64UrlEncode(payload)</span>
+          <span style={{ color: JWT_PART_COLORS.payload }}>base64UrlEncode(payload)</span>
           <span style={{ color: "var(--text-muted)" }}>,</span>
           <br />
-          <span style={{ color: "#61afef" }}>secret</span>
+          <span style={{ color: JWT_PART_COLORS.signature }}>secret</span>
         </div>
         <span style={{ color: "var(--text-muted)" }}>)</span>
       </div>

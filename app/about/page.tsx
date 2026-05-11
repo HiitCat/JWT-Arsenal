@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { pageMeta } from "@/lib/seo";
-import { ExternalLink, Lock, Zap, Globe, BookOpen, Heart, Code2 } from "lucide-react";
+import { Lock, Zap, Globe, BookOpen, Heart, Code2 } from "lucide-react";
+import { Link } from "@/components/shared/Link";
 
 export const metadata: Metadata = pageMeta(
   "About JWT Arsenal",
@@ -46,18 +47,6 @@ function Tag({ children }: { children: ReactNode }) {
   );
 }
 
-function Link({ href, children }: { href: string; children: ReactNode }) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      style={{ color: "var(--accent)", display: "inline-flex", alignItems: "center", gap: "4px", textDecoration: "none" }}
-    >
-      {children} <ExternalLink size={11} />
-    </a>
-  );
-}
 
 export default function AboutPage() {
   return (
@@ -214,14 +203,7 @@ export default function AboutPage() {
               ["OWASP JWT Security Cheat Sheet", "https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html"],
             ].map(([label, href]) => (
               <li key={label}>
-                <a
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: "var(--accent)", display: "inline-flex", alignItems: "center", gap: "4px", textDecoration: "underline", textUnderlineOffset: "3px", textDecorationColor: "rgba(132,204,22,0.35)" }}
-                >
-                  {label} <ExternalLink size={11} style={{ flexShrink: 0 }} />
-                </a>
+                <Link href={href}>{label}</Link>
               </li>
             ))}
           </ul>

@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { ACCENT, TOPIC_COLORS } from "@/lib/colors";
 import { readFileSync } from "fs";
 import { join } from "path";
 
@@ -72,13 +73,13 @@ export default function OgImage() {
             <div style={{
               width: "8px", height: "8px",
               borderRadius: "50%",
-              background: "#84cc16",
+              background: ACCENT,
               boxShadow: "0 0 8px #84cc16",
               display: "flex",
             }} />
             <span style={{
               fontSize: "13px", fontWeight: 400,
-              color: "#84cc16",
+              color: ACCENT,
               letterSpacing: "0.12em",
               textTransform: "uppercase",
             }}>
@@ -106,7 +107,7 @@ export default function OgImage() {
             display: "flex",
             lineHeight: 1.4,
           }}>
-            Forge, inspect &amp; exploit JWT vulnerabilities
+            Forge, inspect & exploit JWT vulnerabilities
             <br />directly in your browser.
           </div>
 
@@ -115,7 +116,7 @@ export default function OgImage() {
             {["Pentest", "Bug Bounty", "CTF", "100% Client-Side"].map((b) => (
               <div key={b} style={{
                 fontSize: "13px", fontWeight: 400,
-                color: "#84cc16",
+                color: ACCENT,
                 border: "1px solid rgba(132,204,22,0.35)",
                 background: "rgba(132,204,22,0.08)",
                 padding: "5px 14px",
@@ -138,13 +139,13 @@ export default function OgImage() {
           flexShrink: 0,
         }}>
           {[
-            { label: "Unverified Signature", color: "#06b6d4" },
-            { label: "Algorithm None",       color: "#f59e0b" },
-            { label: "Algorithm Confusion",  color: "#84cc16" },
-            { label: "KID Injection",        color: "#ef4444" },
-            { label: "JWK Injection",        color: "#ec4899" },
-            { label: "JKU Injection",        color: "#3b82f6" },
-            { label: "Key Recovery",         color: "#22c55e" },
+            { label: "Unverified Signature", color: TOPIC_COLORS.unverifiedSignature },
+            { label: "Algorithm None",       color: TOPIC_COLORS.algNone },
+            { label: "Algorithm Confusion",  color: TOPIC_COLORS.algorithmConfusion },
+            { label: "KID Injection",        color: TOPIC_COLORS.kidInjection },
+            { label: "JWK Injection",        color: TOPIC_COLORS.jwkInjection },
+            { label: "JKU Injection",        color: TOPIC_COLORS.jkuInjection },
+            { label: "Key Recovery",         color: TOPIC_COLORS.publicKeyRecovery },
           ].map((item) => (
             <div key={item.label} style={{
               display: "flex", alignItems: "center", gap: "10px",

@@ -1,19 +1,19 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { TOPIC_COLORS } from "@/lib/colors";
 import { useEffect, useState } from "react";
 import { Icon } from "@/components/shared/Icons";
 
 const exploits = [
-  { href: "/exploit/unverified-signature", label: "Unverified Signature", icon: Icon.Eye,           color: "#06b6d4" },
-  { href: "/exploit/alg-none",             label: "Algorithm None",       icon: Icon.AlertTriangle, color: "#f59e0b" },
-  { href: "/exploit/algorithm-confusion",  label: "Algorithm Confusion",  icon: Icon.Zap,           color: "#84cc16" },
-  { href: "/exploit/kid-injection",        label: "KID Injection",        icon: Icon.Key,           color: "#ef4444" },
-  { href: "/exploit/jwk-injection",        label: "JWK Injection",        icon: Icon.FileKey,       color: "#ec4899" },
-  { href: "/exploit/jku-injection",        label: "JKU Injection",        icon: Icon.Globe,         color: "#3b82f6" },
-  { href: "/exploit/public-key-recovery",  label: "Public Key Recovery",  icon: Icon.Lock,          color: "#22c55e" },
+  { href: "/exploit/unverified-signature", label: "Unverified Signature", icon: Icon.Eye,           color: TOPIC_COLORS.unverifiedSignature },
+  { href: "/exploit/alg-none",             label: "Algorithm None",       icon: Icon.AlertTriangle, color: TOPIC_COLORS.algNone },
+  { href: "/exploit/algorithm-confusion",  label: "Algorithm Confusion",  icon: Icon.Zap,           color: TOPIC_COLORS.algorithmConfusion },
+  { href: "/exploit/kid-injection",        label: "KID Injection",        icon: Icon.Key,           color: TOPIC_COLORS.kidInjection },
+  { href: "/exploit/jwk-injection",        label: "JWK Injection",        icon: Icon.FileKey,       color: TOPIC_COLORS.jwkInjection },
+  { href: "/exploit/jku-injection",        label: "JKU Injection",        icon: Icon.Globe,         color: TOPIC_COLORS.jkuInjection },
+  { href: "/exploit/public-key-recovery",  label: "Public Key Recovery",  icon: Icon.Lock,          color: TOPIC_COLORS.publicKeyRecovery },
 ];
 
 function hexToRgb(hex: string) {
@@ -57,7 +57,7 @@ export function Sidebar() {
       <div style={{ padding: collapsed ? "16px 10px" : "20px 16px 16px", borderBottom: "1px solid var(--border)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: collapsed ? "center" : "space-between", gap: "8px" }}>
           {!collapsed && (
-            <Link
+            <a
               href="/"
               title="JWT Arsenal"
               style={{
@@ -85,7 +85,7 @@ export function Sidebar() {
               >
                 JWT Arsenal
               </span>
-            </Link>
+            </a>
           )}
           <button
             type="button"
@@ -255,7 +255,7 @@ function NavItem({
   hoverMode?: "default" | "reference";
 }) {
   return (
-    <Link
+    <a
       href={href}
       title={collapsed ? label : undefined}
       style={{
@@ -297,7 +297,7 @@ function NavItem({
         <NavIcon size={collapsed ? 14 : 16} />
       </span>
       {!collapsed && label}
-    </Link>
+    </a>
   );
 }
 
@@ -318,7 +318,7 @@ function ExploitNavItem({
 }) {
   const rgb = hexToRgb(color);
   return (
-    <Link
+    <a
       href={href}
       title={collapsed ? label : undefined}
       style={{
@@ -360,6 +360,6 @@ function ExploitNavItem({
         <NavIcon size={collapsed ? 13 : 15} />
       </span>
       {!collapsed && label}
-    </Link>
+    </a>
   );
 }

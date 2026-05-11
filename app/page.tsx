@@ -1,11 +1,11 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import { Icon } from "@/components/shared/Icons";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { GlowCard, hexToRgb } from "@/components/shared/GlowCard";
-import { ExternalLink } from "lucide-react";
+import { Link } from "@/components/shared/Link";
+import { TOPIC_COLORS } from "@/lib/colors";
 
 const techniques = [
   {
@@ -13,49 +13,49 @@ const techniques = [
     name: "Unverified Signature",
     description: "Server accepts tokens without verifying the signature - modify any claim freely.",
     icon: Icon.Eye,
-    color: "#06b6d4",
+    color: TOPIC_COLORS.unverifiedSignature,
   },
   {
     href: "/exploit/alg-none",
     name: "Algorithm None",
-    description: 'Set alg to "none" and strip the signature - server accepts the unsigned token.',
+    description: 'Set alg to "none" and strip the signature - servers might accept unsigned tokens.',
     icon: Icon.AlertTriangle,
-    color: "#f59e0b",
+    color: TOPIC_COLORS.algNone,
   },
   {
     href: "/exploit/algorithm-confusion",
     name: "Algorithm Confusion",
     description: "Server uses RS256 but accepts HS256 - sign with the public key as HMAC secret.",
     icon: Icon.Zap,
-    color: "#a78bfa",
+    color: TOPIC_COLORS.algorithmConfusion,
   },
   {
     href: "/exploit/kid-injection",
     name: "KID Injection",
     description: "Inject path traversal or SQL into the kid header to control which key is used.",
     icon: Icon.Key,
-    color: "#ef4444",
+    color: TOPIC_COLORS.kidInjection,
   },
   {
     href: "/exploit/jwk-injection",
     name: "JWK Injection",
-    description: "Embed your own public JWK in the header - server uses it to verify your forged token.",
+    description: "Embed your own public JWK in the header - servers might use it to verify your forged token.",
     icon: Icon.FileKey,
-    color: "#ec4899",
+    color: TOPIC_COLORS.jwkInjection,
   },
   {
     href: "/exploit/jku-injection",
     name: "JKU Injection",
     description: "Point JKU to an attacker-controlled JWKS endpoint to supply your own signing key.",
     icon: Icon.Globe,
-    color: "#3b82f6",
+    color: TOPIC_COLORS.jkuInjection,
   },
   {
     href: "/exploit/public-key-recovery",
     name: "Public Key Recovery",
     description: "Recover the RSA public key from two signatures, then perform algorithm confusion.",
     icon: Icon.Lock,
-    color: "#22c55e",
+    color: TOPIC_COLORS.publicKeyRecovery,
   },
 ];
 
@@ -256,16 +256,13 @@ export default function HomePage() {
         </h2>
         <div style={{ display: "flex", flexDirection: "column", gap: "12px", maxWidth: "100%" }}>
           <p style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: 1.7, margin: 0 }}>
-            <a href="https://jwt.io" target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent)", display: "inline-flex", alignItems: "center", gap: "4px" }}>
-            jwt.io<ExternalLink size={11} /></a>{" "}is great for decoding, but it
-            doesn&apos;t help you exploit.</p>
+            <Link href="https://jwt.io">jwt.io</Link>{" "} and <Link href="https://token.dev">token.dev</Link>{" "}are great for decoding, but they
+            don't help you exploit.</p>
           <p style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: 1.7, margin: 0 }}>
-            Every JWT exploitation tool you&apos;ll find is CLI-only -{" "}
-            <a href="https://github.com/ticarpi/jwt_tool" target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent)", display: "inline-flex", alignItems: "center", gap: "4px" }}>
-            jwt_tool<ExternalLink size={11} /></a>
+            Every JWT exploitation tool you'll find is CLI-only -{" "}
+            <Link href="https://github.com/ticarpi/jwt_tool">jwt_tool</Link>
             {", "}
-            <a href="https://github.com/hashcat/hashcat" target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent)", display: "inline-flex", alignItems: "center", gap: "4px" }}>
-            hashcat<ExternalLink size={11} /></a>, or custom Python scripts. There&apos;s no browser-based UI for forging attack-specific tokens.
+            <Link href="https://github.com/hashcat/hashcat">hashcat</Link>, or custom Python scripts. There's no browser-based UI for forging attack-specific tokens.
           </p>
           <p style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: 1.7, margin: 0 }}>
             JWT Arsenal fills that gap. Every cryptographic operation runs in your browser using the Web
@@ -274,9 +271,9 @@ export default function HomePage() {
           <p style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: 1.7, margin: 0 }}>
             For operations too heavy for the browser (brute-force, GCD-based key recovery), JWT Arsenal
             provides ready-to-paste CLI commands in the{" "}
-            <a href="/cheatsheet" style={{ color: "var(--accent)", display: "inline-flex", alignItems: "center", gap: "4px" }}>Cheatsheet<ExternalLink size={11} /></a>
+            <Link href="/cheatsheet">Cheatsheet</Link>
             {" "}and deep technical context in the{" "}
-            <a href="/knowledge-base" style={{ color: "var(--accent)", display: "inline-flex", alignItems: "center", gap: "4px" }}>Knowledge Base<ExternalLink size={11} /></a>.
+            <Link href="/knowledge-base">Knowledge Base</Link>.
           </p>
         </div>
       </div>
