@@ -169,22 +169,6 @@ Contributions are welcome - new exploit modules, knowledge base articles, bug fi
 
 ---
 
-## 🗺️ Roadmap
-
-The project is actively maintained. Planned additions:
-
-- [ ] ES256 / ECDSA support across all exploit tools
-- [ ] Token history - persist inspected tokens in `localStorage`
-- [ ] One-click ephemeral JWKS server for JKU testing (via a serverless function)
-- [ ] Batch mode - test multiple tokens in a single pass
-- [ ] Dark / light theme toggle
-- [ ] Additional KB articles - `x5u`, `x5c`, JWT confusion chains, ECDSA nonce reuse
-- [ ] Translations - French 🇫🇷
-
-Have an idea? [Open an issue](https://github.com/HiitCat/jwt-arsenal/issues) - all suggestions are welcome.
-
----
-
 ## ⚠️ Legal Disclaimer
 
 JWT Arsenal is designed for **authorized security testing, CTF competitions, and educational use only**.  
