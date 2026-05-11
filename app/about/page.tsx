@@ -203,14 +203,14 @@ export default function AboutPage() {
         <Section title="Research & references" icon={<BookOpen size={18} />}>
           <ul style={{ margin: 0, paddingLeft: "18px", display: "flex", flexDirection: "column", gap: "10px", fontSize: "14px", listStyleType: "disc", color: "var(--accent)" }}>
             {[
-              ["PortSwigger Web Security Academy — JWT attacks", "https://portswigger.net/web-security/jwt"],
-              ["Tim McLean (2015) — Critical vulnerabilities in JWT libraries", "https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/"],
-              ["PortSwigger Research — Bleichenbacher-style RSA key recovery", "https://portswigger.net/research/authentication-bypass-via-jwt-claim-misinterpretation"],
-              ["silentsignal — rsa_sign2n public key recovery tool", "https://github.com/silentsignal/rsa_sign2n"],
-              ["RFC 7515 — JSON Web Signature (JWS)", "https://www.rfc-editor.org/rfc/rfc7515"],
-              ["RFC 7517 — JSON Web Key (JWK)", "https://www.rfc-editor.org/rfc/rfc7517"],
-              ["RFC 7518 — JSON Web Algorithms (JWA)", "https://www.rfc-editor.org/rfc/rfc7518"],
-              ["RFC 7519 — JSON Web Token (JWT)", "https://www.rfc-editor.org/rfc/rfc7519"],
+              ["PortSwigger Web Security Academy - JWT attacks", "https://portswigger.net/web-security/jwt"],
+              ["Tim McLean (2015) - Critical vulnerabilities in JWT libraries", "https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/"],
+              ["PortSwigger Research - Bleichenbacher-style RSA key recovery", "https://portswigger.net/research/authentication-bypass-via-jwt-claim-misinterpretation"],
+              ["silentsignal - rsa_sign2n public key recovery tool", "https://github.com/silentsignal/rsa_sign2n"],
+              ["RFC 7515 - JSON Web Signature (JWS)", "https://www.rfc-editor.org/rfc/rfc7515"],
+              ["RFC 7517 - JSON Web Key (JWK)", "https://www.rfc-editor.org/rfc/rfc7517"],
+              ["RFC 7518 - JSON Web Algorithms (JWA)", "https://www.rfc-editor.org/rfc/rfc7518"],
+              ["RFC 7519 - JSON Web Token (JWT)", "https://www.rfc-editor.org/rfc/rfc7519"],
               ["OWASP JWT Security Cheat Sheet", "https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html"],
             ].map(([label, href]) => (
               <li key={label}>

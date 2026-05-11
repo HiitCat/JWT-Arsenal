@@ -127,7 +127,7 @@ export function H2({ children, id }: { children: React.ReactNode; id?: string })
 
 export function H3({ children, id }: { children: React.ReactNode; id?: string }) {
   return (
-    <h3 id={id} style={{ fontSize: "16px", fontWeight: 600, color: "var(--text)", margin: "28px 0 12px", scrollMarginTop: "24px" }}>
+    <h3 id={id} style={{ fontSize: "16px", fontWeight: 600, color: "var(--topic-color, var(--text))", margin: "28px 0 12px", scrollMarginTop: "24px" }}>
       {children}
     </h3>
   );
@@ -152,7 +152,7 @@ export function Ref({ href, children }: { href: string; children: React.ReactNod
 
 export function ImpactBox({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ padding: "16px 20px", background: "var(--danger-bg)", border: "1px solid var(--danger-border)", borderRadius: "var(--radius)", marginBottom: "20px" }}>
+    <div style={{ padding: "16px 20px", background: "var(--danger-bg)", border: "1px solid var(--danger-border)", borderRadius: "var(--radius)", marginBottom: "20px", "--list-marker-color": "var(--danger)" } as React.CSSProperties}>
       <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--danger)", marginBottom: "10px", display: "flex", alignItems: "center", gap: "6px" }}>
         <Icon.Skull size={13} /> {title}
       </div>

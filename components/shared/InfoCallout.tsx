@@ -22,7 +22,8 @@ export function InfoCallout({ variant = "info", title, children }: { variant?: V
         display: "flex",
         gap: "12px",
         marginBottom: "20px",
-      }}
+        "--list-marker-color": color,
+      } as React.CSSProperties}
     >
       <Icon size={16} color={color} style={{ flexShrink: 0, marginTop: "1px" }} />
       <div style={{ flex: 1, minWidth: 0 }}>

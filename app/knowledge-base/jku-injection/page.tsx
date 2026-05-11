@@ -37,7 +37,7 @@ export default function Page() {
       "use": "sig",
       "alg": "RS256",
       "kid": "attacker-2024",
-      "n": "sdfG7kPqoK8zRx4s...",   // attacker's public modulus (base64url, no padding)
+      "n": "sdfG7kPqoK8zRx4s...",     // attacker's public modulus (base64url, no padding)
       "e": "AQAB"                     // 65537 in base64url
     }
   ]

@@ -2,6 +2,7 @@
 @import "@fontsource/inter/400.css";
 @import "@fontsource/inter/500.css";
 @import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
 @import "@fontsource/jetbrains-mono/400.css";
 @import "@fontsource/jetbrains-mono/500.css";
 
@@ -159,7 +160,7 @@ body {
   margin: 0;
 }
 .refs-list li::marker {
-  color: var(--accent);
+  color: var(--list-marker-color, var(--accent));
 }
 
 /* KB article body - consistent vertical rhythm */
