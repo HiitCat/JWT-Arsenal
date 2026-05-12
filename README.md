@@ -1,5 +1,9 @@
 <div align="center">
 
+Like the project? Support it with a ⭐!
+
+---
+
 <img src="public/logo.svg" alt="JWT Arsenal Logo" width="72" />
 
 # JWT Arsenal
@@ -137,7 +141,5 @@ The authors accept no liability for misuse. See [about](https://jwtarsenal.com/a
 <div align="center">
 
 Built with 🧪 for the security community.
-
-Like the project? Support it with a ⭐ on GitHub.
 
 </div>
