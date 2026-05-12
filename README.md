@@ -7,8 +7,6 @@
 **The open-source JWT exploitation toolkit - built for the browser.**
 
 [![Live](https://img.shields.io/badge/live-jwtarsenal.com-84cc16?style=flat-square&logo=cloudflare&logoColor=white)](https://jwtarsenal.com)
-[![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)](https://nextjs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![License](https://img.shields.io/badge/license-MIT-a78bfa?style=flat-square)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-06b6d4?style=flat-square)](CONTRIBUTING.md)
 
@@ -19,19 +17,20 @@ No backend. No data leaves your machine. No setup required.
 
 </div>
 
+[![JWT Arsenal homepage](screenshots/homepage.png)](https://jwtarsenal.com)
+
 ---
 
 ## 🎯 What is JWT Arsenal?
 
 JWT Arsenal is a client-side security toolkit for **pentesters**, **CTF players**, and **bug bounty hunters** who need to test JWT implementations - fast. Every cryptographic operation runs locally in your browser using the Web Crypto API and [jose](https://github.com/panva/jose). Nothing is ever sent to a server.
 
-The project also ships a **Knowledge Base** with deep technical articles on each attack - RFC references, vulnerable code patterns, real-world bug bounty examples, and mitigations - so you understand the attack, not just the button that fires it.
-
 ---
 
 ## ✨ Features
 
 ### 🔍 JWT Inspector
+
 Paste any token for an instant breakdown - decoded header, payload, raw signature bytes, algorithm info, and expiration status. Your first stop on any JWT engagement.
 
 ### ⚔️ Exploit Tools
@@ -40,26 +39,27 @@ Paste any token for an instant breakdown - decoded header, payload, raw signatur
 |------|--------|
 | 🔓 **Unverified Signature** | Server decodes the token but never verifies the signature |
 | 🚫 **Algorithm None** | Strip the signature using `alg: "none"` - all casing variants tested |
-| ⚡ **Algorithm Confusion** | Switch RS256 → HS256, sign with the public key as HMAC secret |
+| ⚡ **Algorithm Confusion** | Switch `RS256` → `HS256`, sign with the public key as HMAC secret |
 | 🔑 **KID Injection** | Path traversal, SQL injection, and null-byte payloads via the `kid` header |
 | 📄 **JWK Injection** | Embed your own RSA public key in the JWT header |
 | 🌐 **JKU Injection** | Point `jku` to an attacker-controlled JWKS endpoint |
 | 🔬 **Public Key Recovery** | Recover RSA keys from two signatures via GCD, chain to algorithm confusion |
 
 ### 📚 Knowledge Base
-8 in-depth technical articles - from the JOSE RFC family to real PortSwigger Research findings - with working code examples in Python and JavaScript.
+
+In-depth technical articles - from the JOSE RFC family to real PortSwigger Research findings - with working code examples in Python and JavaScript.
 
 ### 📋 CLI Cheatsheet
+
 Ready-to-copy commands for `hashcat` (GPU cracking), `jwt_tool`, `rsa_sign2n`, and Python snippets for operations too compute-heavy for the browser.
 
 ---
 
 ## 🔒 Privacy First
 
-- **Zero backend** - static export served from a CDN, no server-side code
-- **Zero telemetry** - no analytics SDK, no event tracking, no fingerprinting
+- **Zero backend** - served from a CDN, no server-side code
+- **Zero telemetry** - no application-side telemetry or tracking
 - **Zero network calls at runtime** - all crypto runs via the browser's native Web Crypto API
-- Safely paste real tokens from live engagements without worrying about logs
 
 ---
 
@@ -67,8 +67,8 @@ Ready-to-copy commands for `hashcat` (GPU cracking), `jwt_tool`, `rsa_sign2n`, a
 
 ### Prerequisites
 
-- Node.js ≥ 20
-- npm ≥ 9
+- Node.js >= 20
+- npm >= 9
 
 ### Run locally
 
@@ -82,63 +82,8 @@ npm install
 
 # Start the dev server
 npm run dev
-# → http://localhost:3000
-```
 
-### Build for production
-
-```bash
-npm run build
-# Static output is generated in ./out
-# Deploy the ./out folder anywhere - no server needed
-```
-
----
-
-## 🏗️ Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| **Framework** | [Next.js 16](https://nextjs.org) - App Router, `output: 'export'` |
-| **Language** | TypeScript 5 (strict mode) |
-| **Crypto** | [jose](https://github.com/panva/jose) + native Web Crypto API |
-| **UI** | Radix UI primitives + custom design system |
-| **Fonts** | Inter + JetBrains Mono (self-hosted via Fontsource) |
-| **Hosting** | Cloudflare Pages |
-
-No backend framework. No database. No secrets. Nothing to maintain server-side.
-
----
-
-## 📁 Project Structure
-
-```
-jwt-arsenal/
-├── app/
-│   ├── page.tsx               # Homepage - technique grid
-│   ├── inspect/               # JWT inspector
-│   ├── exploit/               # Exploit tool pages (one per attack)
-│   │   ├── alg-none/
-│   │   ├── algorithm-confusion/
-│   │   ├── jku-injection/
-│   │   ├── jwk-injection/
-│   │   ├── kid-injection/
-│   │   ├── public-key-recovery/
-│   │   └── unverified-signature/
-│   ├── knowledge-base/        # Technical articles (8 topics)
-│   ├── cheatsheet/            # CLI command reference
-│   └── about/                 # Legal + project info
-│
-├── components/
-│   ├── layout/                # Sidebar, KbArticle, PageLoader, GithubFab…
-│   ├── jwt/                   # JwtInput, JwtOutput, PayloadEditor, KeyInput
-│   └── shared/                # GlowCard, CodeBlock, Icons, InfoCallout…
-│
-└── lib/
-    ├── crypto.ts              # RSA/HMAC/ECDSA browser crypto wrappers
-    ├── jwt.ts                 # JWT encode/decode/forge helpers
-    ├── kbTopics.ts            # Knowledge Base metadata
-    └── seo.ts                 # pageMeta() helper + site constants
+# Open http://localhost:3000 in your browser
 ```
 
 ---
@@ -187,6 +132,6 @@ The authors accept no liability for misuse. See [about](https://jwtarsenal.com/a
 
 Built with 🧪 for the security community.
 
-If JWT Arsenal saved you time on an engagement or CTF, consider starring the repo - it helps others find the project. ⭐
+Like the project? Support it with a ⭐ on GitHub.
 
 </div>
