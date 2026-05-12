@@ -1,22 +1,52 @@
+import NextLink from "next/link";
+import type React from "react";
 import { ExternalLink } from "lucide-react";
 
-interface LinkProps {
+interface LinkProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href"> {
   href: string;
-  children: React.ReactNode;
   external?: boolean;
-  style?: React.CSSProperties;
+  showExternalIcon?: boolean;
+  variant?: "inline" | "unstyled";
 }
 
-export function Link({ href, children, external, style }: LinkProps) {
-  const isExternal = external ?? href.startsWith("http");
+export function Link({
+  href,
+  children,
+  external,
+  showExternalIcon = true,
+  variant = "inline",
+  style,
+  target,
+  rel,
+  ...props
+}: LinkProps) {
+  const isExternal = external ?? /^[a-z][a-z\d+.-]*:/.test(href);
+  const linkStyle = variant === "inline"
+    ? { color: "var(--accent)", display: "inline-flex", alignItems: "center", gap: "4px", ...style }
+    : style;
+
+  if (!isExternal) {
+    return (
+      <NextLink
+        href={href}
+        style={linkStyle}
+        {...props}
+      >
+        {children}
+      </NextLink>
+    );
+  }
+
   return (
     <a
       href={href}
-      {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-      style={{ color: "var(--accent)", display: "inline-flex", alignItems: "center", gap: "4px", ...style }}
+      target={target ?? "_blank"}
+      rel={rel ?? "noopener noreferrer"}
+      style={linkStyle}
+      {...props}
     >
       {children}
-      {isExternal && <ExternalLink size={11} />}
+      {showExternalIcon && variant === "inline" && <ExternalLink size={11} />}
     </a>
   );
 }

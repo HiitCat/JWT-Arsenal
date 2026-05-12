@@ -1,5 +1,7 @@
 "use client";
+
 import React, { useRef } from "react";
+import { Link } from "@/components/shared/Link";
 
 export function hexToRgb(hex: string): string {
   return `${parseInt(hex.slice(1, 3), 16)}, ${parseInt(hex.slice(3, 5), 16)}, ${parseInt(hex.slice(5, 7), 16)}`;
@@ -75,7 +77,8 @@ export function GlowCard({ color, href, style, children }: GlowCardProps) {
   };
 
   if (href) {
-    return <a href={href} {...sharedProps}>{overlays}{children}</a>;
+    return <Link href={href} variant="unstyled" {...sharedProps}>{overlays}{children}</Link>;
   }
+
   return <div {...sharedProps}>{overlays}{children}</div>;
 }

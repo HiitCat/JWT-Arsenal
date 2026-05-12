@@ -199,9 +199,10 @@ export default function InspectPage() {
                 {EXPLOIT_PAGES.map((p) => {
                   const rgb = hexToRgb(p.color);
                   return (
-                    <a
+                    <Link
                       key={p.href}
                       href={`${p.href}?jwt=${encodeURIComponent(rawJwt)}`}
+                      variant="unstyled"
                       style={{
                         display: "flex",
                         alignItems: "center",
@@ -240,7 +241,7 @@ export default function InspectPage() {
                         {p.label}
                       </span>
                       <Icon.ChevronRight size={11} />
-                    </a>
+                    </Link>
                   );
                 })}
               </div>

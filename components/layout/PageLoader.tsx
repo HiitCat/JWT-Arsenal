@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Icon } from "@/components/shared/Icons";
 
 const BOOT_LINES = [
@@ -16,17 +16,43 @@ const SCRAMBLE_MS  = 700;
 const PROGRESS_MS  = 1600;
 const FADE_AT      = 1900;
 const UNMOUNT_AT   = 2600;
+const LOADER_SEEN_KEY = "jwt-arsenal-page-loader-seen";
+let loaderResolved = false;
 
 export function PageLoader() {
-  const [mounted,  setMounted]  = useState(true);
+  const [checked,  setChecked]  = useState(loaderResolved);
+  const [mounted,  setMounted]  = useState(!loaderResolved);
   const [visible,  setVisible]  = useState(true);
   const [title,    setTitle]    = useState(TITLE);
   const [lines,    setLines]    = useState<number[]>([]);
   const [progress, setProgress] = useState(0);
   const [cursor,   setCursor]   = useState(true);
 
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem(LOADER_SEEN_KEY)) {
+        loaderResolved = true;
+        requestAnimationFrame(() => {
+          setMounted(false);
+          setChecked(true);
+        });
+        return;
+      }
+
+      sessionStorage.setItem(LOADER_SEEN_KEY, "true");
+      loaderResolved = true;
+    } catch {
+      // If storage is unavailable, keep the loader behavior non-blocking.
+      loaderResolved = true;
+    }
+
+    requestAnimationFrame(() => setChecked(true));
+  }, []);
+
   /* ── scramble title ─────────────────────────────────────── */
   useEffect(() => {
+    if (!checked || !mounted) return;
+
     let raf: number;
     let t0: number | null = null;
     const animate = (ts: number) => {
@@ -41,18 +67,22 @@ export function PageLoader() {
     };
     const id = setTimeout(() => { raf = requestAnimationFrame(animate); }, 180);
     return () => { clearTimeout(id); cancelAnimationFrame(raf); };
-  }, []);
+  }, [checked, mounted]);
 
   /* ── boot lines ─────────────────────────────────────────── */
   useEffect(() => {
+    if (!checked || !mounted) return;
+
     const ids = BOOT_LINES.map((l, i) =>
       setTimeout(() => setLines(prev => [...prev, i]), l.delay)
     );
     return () => ids.forEach(clearTimeout);
-  }, []);
+  }, [checked, mounted]);
 
   /* ── progress bar ───────────────────────────────────────── */
   useEffect(() => {
+    if (!checked || !mounted) return;
+
     let raf: number;
     let t0: number | null = null;
     const update = (ts: number) => {
@@ -63,22 +93,36 @@ export function PageLoader() {
     };
     raf = requestAnimationFrame(update);
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [checked, mounted]);
 
   /* ── cursor blink ───────────────────────────────────────── */
   useEffect(() => {
+    if (!checked || !mounted) return;
+
     const id = setInterval(() => setCursor(v => !v), 530);
     return () => clearInterval(id);
-  }, []);
+  }, [checked, mounted]);
 
   /* ── fade + unmount ─────────────────────────────────────── */
   useEffect(() => {
+    if (!checked || !mounted) return;
+
     const t1 = setTimeout(() => setVisible(false), FADE_AT);
     const t2 = setTimeout(() => setMounted(false), UNMOUNT_AT);
     return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, []);
+  }, [checked, mounted]);
 
   if (!mounted) return null;
+
+  if (!checked) {
+    return (
+      <div style={{
+        position: "fixed", inset: 0, zIndex: 9999,
+        background: "var(--bg)",
+        pointerEvents: "all",
+      }} />
+    );
+  }
 
   return (
     <>

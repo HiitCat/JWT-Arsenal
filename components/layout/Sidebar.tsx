@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { TOPIC_COLORS } from "@/lib/colors";
 import { useEffect, useState } from "react";
 import { Icon } from "@/components/shared/Icons";
+import { Link } from "@/components/shared/Link";
 
 const exploits = [
   { href: "/exploit/unverified-signature", label: "Unverified Signature", icon: Icon.Eye,           color: TOPIC_COLORS.unverifiedSignature },
@@ -57,8 +58,9 @@ export function Sidebar() {
       <div style={{ padding: collapsed ? "16px 10px" : "20px 16px 16px", borderBottom: "1px solid var(--border)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: collapsed ? "center" : "space-between", gap: "8px" }}>
           {!collapsed && (
-            <a
+            <Link
               href="/"
+              variant="unstyled"
               title="JWT Arsenal"
               style={{
                 display: "flex",
@@ -85,7 +87,7 @@ export function Sidebar() {
               >
                 JWT Arsenal
               </span>
-            </a>
+            </Link>
           )}
           <button
             type="button"
@@ -255,8 +257,9 @@ function NavItem({
   hoverMode?: "default" | "reference";
 }) {
   return (
-    <a
+    <Link
       href={href}
+      variant="unstyled"
       title={collapsed ? label : undefined}
       style={{
         display: "flex",
@@ -297,7 +300,7 @@ function NavItem({
         <NavIcon size={collapsed ? 14 : 16} />
       </span>
       {!collapsed && label}
-    </a>
+    </Link>
   );
 }
 
@@ -318,8 +321,9 @@ function ExploitNavItem({
 }) {
   const rgb = hexToRgb(color);
   return (
-    <a
+    <Link
       href={href}
+      variant="unstyled"
       title={collapsed ? label : undefined}
       style={{
         display: "flex",
@@ -360,6 +364,6 @@ function ExploitNavItem({
         <NavIcon size={collapsed ? 13 : 15} />
       </span>
       {!collapsed && label}
-    </a>
+    </Link>
   );
 }
