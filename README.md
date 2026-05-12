@@ -17,7 +17,11 @@ No backend. No data leaves your machine. No setup required.
 
 </div>
 
+---
+
 [![JWT Arsenal homepage](screenshots/homepage.png)](https://jwtarsenal.com)
+
+[![JWT Inspector](screenshots/inspector.png)](https://jwtarsenal.com)
 
 ---
 
