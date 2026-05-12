@@ -39,27 +39,27 @@ JWT Arsenal is a client-side security toolkit for **pentesters**, **CTF players*
 
 ## ✨ Features
 
-### 🔍 JWT Inspector
+### JWT Inspector
 
 Paste any token for an instant breakdown - decoded header, payload, raw signature bytes, algorithm info, and expiration status. Your first stop on any JWT engagement.
 
-### ⚔️ Exploit Tools
+### Exploit Tools
 
 | Tool | Attack |
 |------|--------|
-| 🔓 **Unverified Signature** | Server decodes the token but never verifies the signature |
-| 🚫 **Algorithm None** | Strip the signature using `alg: "none"` - all casing variants tested |
-| ⚡ **Algorithm Confusion** | Switch `RS256` → `HS256`, sign with the public key as HMAC secret |
-| 🔑 **KID Injection** | Path traversal, SQL injection, and null-byte payloads via the `kid` header |
-| 📄 **JWK Injection** | Embed your own RSA public key in the JWT header |
-| 🌐 **JKU Injection** | Point `jku` to an attacker-controlled JWKS endpoint |
-| 🔬 **Public Key Recovery** | Recover RSA keys from two signatures via GCD, chain to algorithm confusion |
+| **Unverified Signature** | Server decodes the token but never verifies the signature |
+| **Algorithm None** | Strip the signature using `alg: "none"` - all casing variants tested |
+| **Algorithm Confusion** | Switch `RS256` → `HS256`, sign with the public key as HMAC secret |
+| **KID Injection** | Path traversal, SQL injection, and null-byte payloads via the `kid` header |
+| **JWK Injection** | Embed your own RSA public key in the JWT header |
+| **JKU Injection** | Point `jku` to an attacker-controlled JWKS endpoint |
+| **Public Key Recovery** | Recover RSA keys from two signatures via GCD, chain to algorithm confusion |
 
-### 📚 Knowledge Base
+### Knowledge Base
 
 In-depth technical articles - from the JOSE RFC family to real PortSwigger Research findings - with working code examples in Python and JavaScript.
 
-### 📋 CLI Cheatsheet
+### CLI Cheatsheet
 
 Ready-to-copy commands for `hashcat` (GPU cracking), `jwt_tool`, `rsa_sign2n`, and Python snippets for operations too compute-heavy for the browser.
 
@@ -140,6 +140,6 @@ The authors accept no liability for misuse. See [about](https://jwtarsenal.com/a
 
 <div align="center">
 
-Built with 🧪 for the security community.
+Built with ❤️ for the security community.
 
 </div>
