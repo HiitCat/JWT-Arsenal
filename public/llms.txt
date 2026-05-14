@@ -1,0 +1,47 @@
+# JWT Arsenal
+
+> 100% client-side JWT exploitation toolkit for pentesters, CTF players and bug bounty hunters. Forge, inspect and exploit JWT vulnerabilities directly in your browser - no server, no data leaves your machine.
+
+URL: https://jwtarsenal.com
+Source: https://github.com/HiitCat/JWT-Arsenal
+License: MIT
+
+## Exploit Tools
+
+Each tool runs entirely client-side using the Web Crypto API and the jose library.
+
+- [JWT Inspector](https://jwtarsenal.com/inspect): Decode and inspect any JWT token - header, payload, signature - with color-coded output.
+- [Unverified Signature](https://jwtarsenal.com/exploit/unverified-signature): Test whether a server validates JWT signatures or merely decodes the payload.
+- [Algorithm None](https://jwtarsenal.com/exploit/alg-none): Forge unsigned JWT tokens by setting alg to "none". Generates all case variants (none, None, NONE, nOnE).
+- [Algorithm Confusion](https://jwtarsenal.com/exploit/algorithm-confusion): Switch alg from RS256 to HS256 and sign with the RSA public key as HMAC secret.
+- [KID Injection](https://jwtarsenal.com/exploit/kid-injection): Inject path traversal, SQL, or arbitrary values into the kid header parameter.
+- [JWK Injection](https://jwtarsenal.com/exploit/jwk-injection): Embed an attacker-controlled RSA public key in the JWT header (jwk field).
+- [JKU Injection](https://jwtarsenal.com/exploit/jku-injection): Replace jku with an attacker-controlled JWKS endpoint URL, includes self-hosted JWKS.
+- [Public Key Recovery](https://jwtarsenal.com/exploit/public-key-recovery): Recover the RSA public key from two signed JWTs via GCD, then chain to algorithm confusion.
+
+## Knowledge Base
+
+In-depth technical articles on each attack technique.
+
+- [JWT Structure & Internals](https://jwtarsenal.com/knowledge-base/jwt-structure): Header fields, payload claims, base64url encoding, JOSE standards.
+- [Unverified Signature](https://jwtarsenal.com/knowledge-base/unverified-signature): How and why servers skip signature verification.
+- [Algorithm None](https://jwtarsenal.com/knowledge-base/alg-none): RFC 7518 loophole, case variation bypasses, affected libraries (2015 disclosure).
+- [Algorithm Confusion](https://jwtarsenal.com/knowledge-base/algorithm-confusion): RS256→HS256 mechanics, key format details, ES256 variant, vulnerable code patterns.
+- [KID Injection](https://jwtarsenal.com/knowledge-base/kid-injection): Path traversal, SQL injection, SSRF via the kid header.
+- [JWK Injection](https://jwtarsenal.com/knowledge-base/jwk-injection): Embedding attacker keys in the token header.
+- [JKU Injection](https://jwtarsenal.com/knowledge-base/jku-injection): JWKS endpoint hijacking and bypass techniques.
+- [Public Key Recovery](https://jwtarsenal.com/knowledge-base/public-key-recovery): GCD-based RSA key recovery from two signatures.
+
+## CLI Cheatsheet
+
+- [CLI Cheatsheet](https://jwtarsenal.com/cheatsheet): Commands for jwt_tool, hashcat (mode 16500), and rsa_sign2n covering all attack techniques.
+
+## Quick Reference
+
+Common questions answered:
+
+- How to exploit alg:none → https://jwtarsenal.com/exploit/alg-none
+- How to perform algorithm confusion RS256→HS256 → https://jwtarsenal.com/exploit/algorithm-confusion
+- How to recover RSA public key from two JWTs → https://jwtarsenal.com/exploit/public-key-recovery
+- JWT security testing cheatsheet → https://jwtarsenal.com/cheatsheet
+- All JWT attack techniques explained → https://jwtarsenal.com/knowledge-base

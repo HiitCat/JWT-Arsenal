@@ -485,9 +485,9 @@ function TimingTimeline({ payload }: { payload: Record<string, unknown> }) {
   // px layout: bar centered at CONTAINER_H/2
   const CONTAINER_H = 40;
   const BAR_H = 4;
-  const BAR_TOP = (CONTAINER_H - BAR_H) / 2; // 18 — bar center = 20 = container center
-  const TICK_TOP = BAR_TOP - 6;              // 12 — tick starts 6px above bar
-  const TICK_H = BAR_H + 12;                // 16 — tick ends 8px below bar
+  const BAR_TOP = (CONTAINER_H - BAR_H) / 2; // 18 - bar center = 20 = container center
+  const TICK_TOP = BAR_TOP - 6;              // 12 - tick starts 6px above bar
+  const TICK_H = BAR_H + 12;                // 16 - tick ends 8px below bar
 
   const fmtDate = (ts: number) =>
     new Date(ts * 1000).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
