@@ -6,6 +6,8 @@ import { TOPIC_COLORS } from "@/lib/colors";
 import { useEffect, useState } from "react";
 import { Icon } from "@/components/shared/Icons";
 import { Link } from "@/components/shared/Link";
+import clsx from "clsx";
+import s from "@/styles/layout/Sidebar.module.css";
 
 const exploits = [
   { href: "/exploit/unverified-signature", label: "Unverified Signature", icon: Icon.Eye,           color: TOPIC_COLORS.unverifiedSignature },
@@ -39,86 +41,23 @@ export function Sidebar() {
   }, [collapsed]);
 
   return (
-    <aside
-      style={{
-        width: collapsed ? "68px" : "var(--sidebar-width)",
-        minWidth: collapsed ? "68px" : "var(--sidebar-width)",
-        background: "var(--bg-elevated)",
-        borderRight: "1px solid var(--border)",
-        display: "flex",
-        flexDirection: "column",
-        height: "100vh",
-        position: "sticky",
-        top: 0,
-        overflowY: "auto",
-        transition: "width 0.18s ease, min-width 0.18s ease",
-      }}
-    >
+    <aside className={clsx(s.sidebar, collapsed && s.collapsed)}>
       {/* Logo */}
-      <div style={{ padding: collapsed ? "16px 10px" : "20px 16px 16px", borderBottom: "1px solid var(--border)" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: collapsed ? "center" : "space-between", gap: "8px" }}>
+      <div className={s.logoBar}>
+        <div className={s.logoRow}>
           {!collapsed && (
-            <Link
-              href="/"
-              variant="unstyled"
-              title="JWT Arsenal"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-start",
-                gap: "12px",
-                textDecoration: "none",
-                minWidth: 0,
-                flex: 1,
-              }}
-            >
+            <Link href="/" variant="unstyled" className={s.logoLink} title="JWT Arsenal">
               <Icon.Logo size={16} />
-              <span
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontWeight: 700,
-                  fontSize: "14px",
-                  background: "var(--gradient-logo)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                  letterSpacing: "-0.02em",
-                }}
-              >
-                JWT Arsenal
-              </span>
+              <span className={s.logoText}>JWT Arsenal</span>
             </Link>
           )}
           <button
             type="button"
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            onClick={() => setCollapsed((value) => !value)}
-            style={{
-              width: collapsed ? "44px" : "28px",
-              height: collapsed ? "44px" : "28px",
-              borderRadius: "var(--radius)",
-              border: "1px solid var(--border)",
-              background: "transparent",
-              color: "var(--text-muted)",
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              flexShrink: 0,
-              position: "relative",
-            }}
+            onClick={() => setCollapsed((v) => !v)}
+            className={s.collapseBtn}
           >
-            <span
-              style={{
-                display: "inline-flex",
-                position: "absolute",
-                inset: 0,
-                alignItems: "center",
-                justifyContent: "center",
-                transform: collapsed ? "rotate(0deg)" : "rotate(180deg)",
-                transition: "transform 0.15s ease",
-              }}
-            >
+            <span className={clsx(s.collapseBtnIcon, !collapsed && s.rotated)}>
               <Icon.ChevronRight size={14} />
             </span>
           </button>
@@ -126,39 +65,15 @@ export function Sidebar() {
       </div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, padding: "10px 8px" }}>
+      <nav className={s.nav}>
         <NavItem href="/inspect" icon={Icon.Search} label="Inspect Token" isActive={isActive("/inspect")} collapsed={collapsed} />
-        <SectionDivider collapsed={collapsed} />
+        <div className={s.divider} />
 
-        {/* Exploits section */}
-        <div style={{ marginTop: "8px" }}>
+        <div className={s.exploitsSection}>
           {!collapsed && (
-            <button
-              onClick={() => setExploitsOpen((o) => !o)}
-              style={{
-                width: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "6px 8px",
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                color: "var(--text-muted)",
-                fontSize: "10px",
-                fontWeight: 700,
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-              }}
-            >
+            <button className={s.sectionLabel} onClick={() => setExploitsOpen((o) => !o)}>
               Exploits
-              <span
-                style={{
-                  display: "inline-flex",
-                  transform: exploitsOpen ? "rotate(0deg)" : "rotate(-90deg)",
-                  transition: "transform 0.15s",
-                }}
-              >
+              <span className={clsx(s.chevron, !exploitsOpen && s.up)}>
                 <Icon.ChevronDown size={12} />
               </span>
             </button>
@@ -179,65 +94,28 @@ export function Sidebar() {
             </div>
           )}
         </div>
-        <SectionDivider collapsed={collapsed} />
 
-        {/* Reference */}
-        <div style={{ marginTop: "16px" }}>
-          {!collapsed && (
-            <div
-              style={{
-                padding: "6px 8px",
-                color: "var(--text-muted)",
-                fontSize: "10px",
-                fontWeight: 700,
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-              }}
-            >
-              Reference
-            </div>
-          )}
-          <NavItem href="/cheatsheet"     icon={Icon.Terminal}  label="CLI Cheatsheet"  isActive={isActive("/cheatsheet")} collapsed={collapsed} hoverMode="reference" />
-          <NavItem href="/knowledge-base" icon={Icon.BookOpen}  label="Knowledge Base"  isActive={isActive("/knowledge-base")} collapsed={collapsed} hoverMode="reference" />
-          <NavItem href="/about"          icon={Icon.Info}      label="About"           isActive={isActive("/about")} collapsed={collapsed} hoverMode="reference" />
+        <div className={s.divider} />
+
+        <div className={s.referenceSection}>
+          {!collapsed && <div className={s.sectionLabelText}>Reference</div>}
+          <NavItem href="/cheatsheet"     icon={Icon.Terminal} label="CLI Cheatsheet" isActive={isActive("/cheatsheet")}     collapsed={collapsed} hoverMode="reference" />
+          <NavItem href="/knowledge-base" icon={Icon.BookOpen} label="Knowledge Base" isActive={isActive("/knowledge-base")} collapsed={collapsed} hoverMode="reference" />
+          <NavItem href="/about"          icon={Icon.Info}     label="About"          isActive={isActive("/about")}          collapsed={collapsed} hoverMode="reference" />
         </div>
       </nav>
 
-      {/* Footer badge */}
-      <div
-        style={{
-          padding: collapsed ? "12px 10px" : "12px 16px",
-          borderTop: "1px solid var(--border)",
-          display: "flex",
-          alignItems: "center",
-          gap: "6px",
-          justifyContent: collapsed ? "center" : "flex-start",
-        }}
-        title={collapsed ? "100% client-side - No data leaves your browser" : undefined}
-      >
-        <span style={{ color: "var(--accent)" }}><Icon.Lock size={11} /></span>
+      {/* Footer */}
+      <div className={s.footer} title={collapsed ? "100% client-side - No data leaves your browser" : undefined}>
+        <span className={s.footerIcon}><Icon.Lock size={11} /></span>
         {!collapsed && (
-          <span style={{ fontSize: "11px", color: "var(--text-muted)", lineHeight: 1.4 }}>
-            100% client-side
-            <br />
+          <span className={s.footerText}>
+            100% client-side<br />
             No data leaves your browser
           </span>
         )}
       </div>
     </aside>
-  );
-}
-
-function SectionDivider({ collapsed }: { collapsed: boolean }) {
-  return (
-    <div
-      style={{
-        height: "1px",
-        margin: collapsed ? "12px 6px" : "12px 8px",
-        background: "var(--border)",
-        opacity: 0.8,
-      }}
-    />
   );
 }
 
@@ -261,42 +139,9 @@ function NavItem({
       href={href}
       variant="unstyled"
       title={collapsed ? label : undefined}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: collapsed ? "center" : "flex-start",
-        gap: collapsed ? 0 : "8px",
-        padding: collapsed ? "0" : "7px 8px",
-        width: collapsed ? "44px" : undefined,
-        height: collapsed ? "44px" : undefined,
-        boxSizing: "border-box",
-        borderRadius: "var(--radius)",
-        textDecoration: "none",
-        color: isActive ? "var(--text)" : "var(--text-muted)",
-        background: isActive ? "var(--accent-tint)" : "transparent",
-        fontSize: collapsed ? "13px" : "14px",
-        fontWeight: collapsed ? 400 : 500,
-        marginBottom: "1px",
-        transition: "color 0.1s, background 0.1s",
-        borderWidth: collapsed ? "0" : "0 0 0 2px",
-        borderStyle: "solid",
-        borderColor: collapsed ? "transparent" : isActive ? "var(--accent)" : "transparent",
-        boxShadow: collapsed && isActive ? "inset 0 0 0 1px var(--accent-border-soft)" : undefined,
-      }}
-      onMouseEnter={(e) => {
-        if (!isActive && !collapsed && hoverMode === "reference") {
-          (e.currentTarget as HTMLElement).style.background = "var(--surface-overlay-hover)";
-          (e.currentTarget as HTMLElement).style.color = "var(--text)";
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!isActive && !collapsed && hoverMode === "reference") {
-          (e.currentTarget as HTMLElement).style.background = "transparent";
-          (e.currentTarget as HTMLElement).style.color = "var(--text-muted)";
-        }
-      }}
+      className={clsx(s.navItem, isActive && s.active, hoverMode === "reference" && s.reference)}
     >
-      <span style={{ color: isActive ? "var(--accent)" : "var(--text-muted)", display: "inline-flex" }}>
+      <span className={s.navIcon}>
         <NavIcon size={collapsed ? 14 : 16} />
       </span>
       {!collapsed && label}
@@ -325,26 +170,11 @@ function ExploitNavItem({
       href={href}
       variant="unstyled"
       title={collapsed ? label : undefined}
+      className={s.exploitItem}
       style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: collapsed ? "center" : "flex-start",
-        gap: collapsed ? 0 : "8px",
-        padding: collapsed ? "0" : "6px 8px",
-        width: collapsed ? "44px" : undefined,
-        height: collapsed ? "44px" : undefined,
-        boxSizing: "border-box",
-        borderRadius: "var(--radius)",
-        textDecoration: "none",
         color: isActive ? "var(--text)" : "var(--text-muted)",
         background: isActive ? `rgba(${rgb}, 0.1)` : "transparent",
-        fontSize: collapsed ? "13px" : "14px",
-        fontWeight: collapsed ? 400 : 500,
-        marginBottom: "1px",
-        transition: "color 0.1s, background 0.1s",
-        borderWidth: collapsed ? "0" : "0 0 0 2px",
-        borderStyle: "solid",
-        borderColor: collapsed ? "transparent" : isActive ? color : "transparent",
+        borderLeftColor: !collapsed && isActive ? color : "transparent",
         boxShadow: collapsed && isActive ? `inset 0 0 0 1px rgba(${rgb}, 0.35)` : undefined,
       }}
       onMouseEnter={(e) => {

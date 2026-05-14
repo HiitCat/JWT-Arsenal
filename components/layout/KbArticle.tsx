@@ -5,17 +5,18 @@ import { KB_TOPICS, LAB_BASE, KbTopic } from "@/lib/kbTopics";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { Icon } from "@/components/shared/Icons";
 import { Link } from "@/components/shared/Link";
+import s from "@/styles/layout/KbArticle.module.css";
 
 type IconFn = (p: { size?: number }) => React.ReactElement;
 const TOPIC_ICONS: Record<string, IconFn> = {
-  "jwt-structure":       Icon.Layers,
+  "jwt-structure":        Icon.Layers,
   "unverified-signature": Icon.Eye,
-  "alg-none":            Icon.AlertTriangle,
-  "algorithm-confusion": Icon.Zap,
-  "kid-injection":       Icon.Key,
-  "jwk-injection":       Icon.FileKey,
-  "jku-injection":       Icon.Globe,
-  "public-key-recovery": Icon.Lock,
+  "alg-none":             Icon.AlertTriangle,
+  "algorithm-confusion":  Icon.Zap,
+  "kid-injection":        Icon.Key,
+  "jwk-injection":        Icon.FileKey,
+  "jku-injection":        Icon.Globe,
+  "public-key-recovery":  Icon.Lock,
 };
 export { Mono } from "@/components/shared/Mono";
 
@@ -33,20 +34,20 @@ export function KbArticle({ slug, children }: KbArticleProps) {
 
   return (
     <PageContainer variant="article">
-      <div style={{ paddingTop: "28px", paddingBottom: "64px" }}>
+      <div className={s.page}>
 
         {/* Breadcrumb */}
-        <nav style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "var(--text-muted)", marginBottom: "32px" }}>
-          <Link href="/knowledge-base" variant="unstyled" style={{ color: "var(--text-muted)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+        <nav className={s.breadcrumb}>
+          <Link href="/knowledge-base" variant="unstyled" className={s.breadcrumbLink}>
             <Icon.BookOpen size={12} /> Knowledge Base
           </Link>
-          <span style={{ opacity: 0.4 }}>/</span>
-          <span style={{ color: "var(--text)" }}>{topic.title}</span>
+          <span className={s.breadcrumbSep}>/</span>
+          <span className={s.breadcrumbCurrent}>{topic.title}</span>
         </nav>
 
         {/* Article header */}
-        <div style={{ marginBottom: "32px", paddingBottom: "28px", borderBottom: "1px solid var(--border)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "16px" }}>
+        <div className={s.articleHeader}>
+          <div className={s.articleTitleRow}>
             <div style={{
               width: "44px", height: "44px", borderRadius: "10px", flexShrink: 0,
               background: `${topic.color}18`,
@@ -56,21 +57,17 @@ export function KbArticle({ slug, children }: KbArticleProps) {
             }}>
               <TopicIcon size={20} />
             </div>
-            <h1 style={{ fontSize: "32px", fontWeight: 700, color: topic.color, margin: 0, lineHeight: 1.2 }}>
-              {topic.title}
-            </h1>
+            <h1 className={s.articleTitle} style={{ color: topic.color }}>{topic.title}</h1>
           </div>
-          <p style={{ fontSize: "16px", color: "var(--text-muted)", lineHeight: 1.7, margin: "0 0 20px", maxWidth: "680px" }}>
-            {topic.description}
-          </p>
-          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+          <p className={s.articleDesc}>{topic.description}</p>
+          <div className={s.articleActions}>
             {topic.exploitHref && (
-              <Link href={topic.exploitHref} variant="unstyled" style={{ display: "inline-flex", alignItems: "center", gap: "5px", height: "32px", padding: "0 12px", background: "var(--accent-tint)", border: "1px solid var(--accent-border-mid)", borderRadius: "var(--radius)", color: "var(--accent)", textDecoration: "none", fontSize: "12px", fontWeight: 500 }}>
+              <Link href={topic.exploitHref} variant="unstyled" className={`${s.actionBtn} ${s.actionBtnAccent}`}>
                 <Icon.Wand size={11} /> Open exploit tool
               </Link>
             )}
             {topic.labPath && (
-              <Link href={`${LAB_BASE}/${topic.labPath}`} variant="unstyled" style={{ display: "inline-flex", alignItems: "center", gap: "5px", height: "32px", padding: "0 12px", background: "var(--bg-elevated)", border: "1px solid var(--border)", borderRadius: "var(--radius)", color: "var(--text-muted)", textDecoration: "none", fontSize: "12px", fontWeight: 500 }}>
+              <Link href={`${LAB_BASE}/${topic.labPath}`} variant="unstyled" className={`${s.actionBtn} ${s.actionBtnMuted}`}>
                 <Icon.FlaskConical size={11} /> {topic.labName}
               </Link>
             )}
@@ -79,39 +76,49 @@ export function KbArticle({ slug, children }: KbArticleProps) {
 
         {/* Article body */}
         <div
-          className="kb-article-body"
-          style={{
-            "--topic-color": topic.color,
-            background: "var(--bg-elevated)",
-            border: "1px solid var(--border)",
-            borderRadius: "var(--radius)",
-            padding: "32px",
-            marginBottom: "40px",
-          } as React.CSSProperties}
+          className={`kb-article-body ${s.articleBody}`}
+          style={{ "--topic-color": topic.color } as React.CSSProperties}
         >
           {children}
         </div>
 
         {/* Prev / Next */}
-        <div style={{ display: "flex", gap: "24px", marginTop: "64px", paddingTop: "32px", borderTop: "1px solid var(--border)" }}>
-          {prev ? (() => { const PrevIcon = TOPIC_ICONS[prev.slug]; return (
-            <Link href={`/knowledge-base/${prev.slug}`} variant="unstyled" style={{ flex: 1, display: "flex", alignItems: "center", gap: "10px", padding: "14px 16px", background: `${prev.color}0d`, border: `1px solid ${prev.color}35`, borderRadius: "var(--radius)", textDecoration: "none", transition: "border-color 0.15s" }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = `${prev.color}70`; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = `${prev.color}35`; }}>
-              <span style={{ fontSize: "14px", color: prev.color, flexShrink: 0 }}>←</span>
-              <span style={{ fontSize: "14px", fontWeight: 500, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{prev.title}</span>
-              {PrevIcon && <span style={{ color: prev.color, flexShrink: 0, display: "flex", alignItems: "center" }}><PrevIcon size={15} /></span>}
-            </Link>
-          ); })() : <div style={{ flex: 1 }} />}
-          {next ? (() => { const NextIcon = TOPIC_ICONS[next.slug]; return (
-            <Link href={`/knowledge-base/${next.slug}`} variant="unstyled" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "10px", padding: "14px 16px", background: `${next.color}0d`, border: `1px solid ${next.color}35`, borderRadius: "var(--radius)", textDecoration: "none", transition: "border-color 0.15s" }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = `${next.color}70`; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = `${next.color}35`; }}>
-              {NextIcon && <span style={{ color: next.color, flexShrink: 0, display: "flex", alignItems: "center" }}><NextIcon size={15} /></span>}
-              <span style={{ fontSize: "14px", fontWeight: 500, color: "var(--text)", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{next.title}</span>
-              <span style={{ fontSize: "14px", color: next.color, flexShrink: 0 }}>→</span>
-            </Link>
-          ); })() : <div style={{ flex: 1 }} />}
+        <div className={s.nav}>
+          {prev ? (() => {
+            const PrevIcon = TOPIC_ICONS[prev.slug];
+            return (
+              <Link
+                href={`/knowledge-base/${prev.slug}`}
+                variant="unstyled"
+                className={s.navLink}
+                style={{ background: `${prev.color}0d`, border: `1px solid ${prev.color}35` }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = `${prev.color}70`; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = `${prev.color}35`; }}
+              >
+                <span className={s.navArrow} style={{ color: prev.color }}>←</span>
+                <span className={s.navLinkLabel}>{prev.title}</span>
+                {PrevIcon && <span className={s.navIcon} style={{ color: prev.color }}><PrevIcon size={15} /></span>}
+              </Link>
+            );
+          })() : <div className={s.navSpacer} />}
+
+          {next ? (() => {
+            const NextIcon = TOPIC_ICONS[next.slug];
+            return (
+              <Link
+                href={`/knowledge-base/${next.slug}`}
+                variant="unstyled"
+                className={`${s.navLink} ${s.navLinkNext}`}
+                style={{ background: `${next.color}0d`, border: `1px solid ${next.color}35` }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = `${next.color}70`; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = `${next.color}35`; }}
+              >
+                {NextIcon && <span className={s.navIcon} style={{ color: next.color }}><NextIcon size={15} /></span>}
+                <span className={`${s.navLinkLabel} ${s.navLinkLabelNext}`}>{next.title}</span>
+                <span className={s.navArrow} style={{ color: next.color }}>→</span>
+              </Link>
+            );
+          })() : <div className={s.navSpacer} />}
         </div>
       </div>
     </PageContainer>
@@ -119,29 +126,16 @@ export function KbArticle({ slug, children }: KbArticleProps) {
 }
 
 export function H2({ children, id }: { children: React.ReactNode; id?: string }) {
-  return (
-    <h2 id={id} style={{ fontSize: "20px", fontWeight: 700, color: "var(--topic-color, var(--text))", margin: "40px 0 16px", scrollMarginTop: "24px", lineHeight: 1.3 }}>
-      {children}
-    </h2>
-  );
+  return <h2 id={id} className={s.h2}>{children}</h2>;
 }
 
 export function H3({ children, id }: { children: React.ReactNode; id?: string }) {
-  return (
-    <h3 id={id} style={{ fontSize: "16px", fontWeight: 600, color: "var(--topic-color, var(--text))", margin: "28px 0 12px", scrollMarginTop: "24px" }}>
-      {children}
-    </h3>
-  );
+  return <h3 id={id} className={s.h3}>{children}</h3>;
 }
 
 export function P({ children }: { children: React.ReactNode }) {
-  return (
-    <p style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: 1.8, margin: "0 0 16px" }}>
-      {children}
-    </p>
-  );
+  return <p className={s.p}>{children}</p>;
 }
-
 
 export function Ref({ href, children }: { href: string; children: React.ReactNode }) {
   return <Link href={href}>{children}</Link>;
@@ -149,11 +143,11 @@ export function Ref({ href, children }: { href: string; children: React.ReactNod
 
 export function ImpactBox({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ padding: "16px 20px", background: "var(--danger-bg)", border: "1px solid var(--danger-border)", borderRadius: "var(--radius)", marginBottom: "20px", "--list-marker-color": "var(--danger)" } as React.CSSProperties}>
-      <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--danger)", marginBottom: "10px", display: "flex", alignItems: "center", gap: "6px" }}>
+    <div className={s.impactBox} style={{ "--list-marker-color": "var(--danger)" } as React.CSSProperties}>
+      <div className={s.impactTitle}>
         <Icon.Skull size={13} /> {title}
       </div>
-      <div style={{ fontSize: "13px", color: "var(--text-muted)", lineHeight: 1.75 }}>{children}</div>
+      <div className={s.impactContent}>{children}</div>
     </div>
   );
 }

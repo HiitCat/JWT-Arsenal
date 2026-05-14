@@ -9,7 +9,6 @@ export const metadata: Metadata = pageMeta(
   "The server decodes the token but never calls the cryptographic verification function - any forged payload is accepted.",
   "/knowledge-base/unverified-signature",
 );
-import "../../globals.css";
 
 export default function Page() {
   return (

@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import clsx from "clsx";
+import s from "@/styles/jwt/PayloadEditor.module.css";
 
 interface PayloadEditorProps {
-  /** Initial value - when this changes identity, use a key prop on the parent to reset */
   initialValue: Record<string, unknown>;
   onChange: (value: Record<string, unknown>) => void;
   label?: string;
@@ -26,35 +27,14 @@ export function PayloadEditor({ initialValue, onChange, label }: PayloadEditorPr
 
   return (
     <div>
-      {label && (
-        <label style={{ display: "block", fontSize: "13px", fontWeight: 500, color: "var(--text-muted)", marginBottom: "8px" }}>
-          {label}
-        </label>
-      )}
+      {label && <label className={s.label}>{label}</label>}
       <textarea
         value={text}
         onChange={(e) => handleChange(e.target.value)}
         spellCheck={false}
-        style={{
-          width: "100%",
-          minHeight: "160px",
-          padding: "12px 16px",
-          background: "var(--bg)",
-          border: `1px solid ${error ? "var(--danger)" : "var(--border)"}`,
-          borderRadius: "var(--radius)",
-          color: "var(--text)",
-          fontFamily: "var(--font-mono)",
-          fontSize: "13px",
-          lineHeight: 1.6,
-          resize: "vertical",
-          outline: "none",
-        }}
-        onFocus={(e) => { e.currentTarget.style.border = `1px solid ${error ? "var(--danger)" : "var(--accent)"}`; }}
-        onBlur={(e) => { e.currentTarget.style.border = `1px solid ${error ? "var(--danger)" : "var(--border)"}`; }}
+        className={clsx(s.textarea, error && s.error)}
       />
-      {error && (
-        <p style={{ fontSize: "12px", color: "var(--danger)", margin: "4px 0 0" }}>{error}</p>
-      )}
+      {error && <p className={s.errorMsg}>{error}</p>}
     </div>
   );
 }

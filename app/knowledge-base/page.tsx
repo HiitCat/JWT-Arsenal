@@ -4,7 +4,6 @@ import { PageContainer } from "@/components/layout/PageContainer";
 import { Icon } from "@/components/shared/Icons";
 import { KB_TOPICS } from "@/lib/kbTopics";
 import { GlowCard, hexToRgb } from "@/components/shared/GlowCard";
-import "../globals.css";
 
 const ICONS: Record<string, (p: { size?: number }) => React.ReactElement> = {
   "jwt-structure":        Icon.Layers,

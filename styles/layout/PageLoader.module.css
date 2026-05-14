@@ -1,0 +1,149 @@
+.blocker {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--bg);
+  pointer-events: all;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: opacity 0.65s cubic-bezier(0.4, 0, 1, 1);
+}
+
+.ambient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 70% 55% at 50% 50%, rgba(132, 204, 22, 0.07) 0%, transparent 70%);
+}
+
+.scanline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-border-mid), transparent);
+  animation: scan 1.8s linear forwards;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.sphere {
+  animation: sphereIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  margin-bottom: 18px;
+}
+
+.titleRow {
+  font-family: var(--font-mono);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+  margin-bottom: 44px;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.titleText {
+  display: inline-block;
+}
+
+.cursor {
+  transition: opacity 0.1s;
+}
+
+.terminal {
+  width: min(420px, 88vw);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 28px;
+}
+
+.termLine {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: lineIn 0.28s ease forwards;
+}
+
+.termText {
+  color: var(--text-muted);
+}
+
+.termPrompt {
+  color: var(--accent);
+  opacity: 0.5;
+  margin-right: 8px;
+}
+
+.okBadge {
+  color: var(--success);
+  font-size: 11px;
+  background: var(--success-tint);
+  border: 1px solid var(--success-border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  flex-shrink: 0;
+}
+
+.progressTrack {
+  width: min(420px, 88vw);
+  height: 2px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-mid));
+  border-radius: 2px;
+  transition: width 0.06s linear;
+}
+
+.progressBarGlow {
+  animation: barGlow 0.9s ease-in-out infinite;
+}
+
+.footer {
+  margin-top: 14px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  opacity: 0.4;
+  letter-spacing: 0.08em;
+}
+
+@keyframes sphereIn {
+  0%   { opacity: 0; transform: scale(0.55) translateY(12px); }
+  65%  { transform: scale(1.07) translateY(-4px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes lineIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scan {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes barGlow {
+  0%, 100% { box-shadow: 0 0 6px var(--accent-glow); }
+  50%       { box-shadow: 0 0 16px var(--accent-glow), 0 0 32px var(--accent-border); }
+}

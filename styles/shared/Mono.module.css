@@ -1,0 +1,8 @@
+.mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent);
+  background: var(--accent-faint);
+  padding: 1px 5px;
+  border-radius: 4px;
+}

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import { Icon } from "@/components/shared/Icons";
+import s from "@/styles/layout/GithubFab.module.css";
 
 const GITHUB_URL = "https://github.com/HiitCat/JWT-Arsenal";
 const LABEL = "GitHub";
@@ -10,7 +11,6 @@ const DURATION = 480;
 
 export function GithubFab() {
   const [text, setText] = useState(LABEL);
-  const [hovered, setHovered] = useState(false);
   const rafRef = useRef<number | null>(null);
   const t0Ref = useRef<number | null>(null);
 
@@ -28,14 +28,12 @@ export function GithubFab() {
   }, []);
 
   const onEnter = () => {
-    setHovered(true);
     t0Ref.current = null;
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(animate);
   };
 
   const onLeave = () => {
-    setHovered(false);
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     setText(LABEL);
   };
@@ -48,33 +46,10 @@ export function GithubFab() {
       title="GitHub repository"
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
-      style={{
-        position: "fixed",
-        bottom: "24px",
-        right: "24px",
-        zIndex: 50,
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "7px",
-        height: "40px",
-        padding: "0 14px",
-        background: hovered ? "var(--info-tint)" : "var(--bg-elevated)",
-        border: `1px solid ${hovered ? "var(--info-border)" : "var(--border)"}`,
-        borderRadius: "100px",
-        color: hovered ? "var(--info)" : "var(--text-muted)",
-        textDecoration: "none",
-        fontSize: "13px",
-        fontWeight: 500,
-        boxShadow: hovered
-          ? "0 0 0 1px var(--info-border), 0 4px 20px rgba(124,92,255,0.15)"
-          : "0 4px 16px rgba(0,0,0,0.4)",
-        transition: "color 0.2s, border-color 0.2s, box-shadow 0.2s, background 0.2s",
-      }}
+      className={s.fab}
     >
       <Icon.Github size={14} />
-      <span style={{ fontFamily: "var(--font-mono)", display: "inline-block", width: "46px" }}>
-        {text}
-      </span>
+      <span className={s.label}>{text}</span>
     </a>
   );
 }

@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Icon } from "@/components/shared/Icons";
+import clsx from "clsx";
+import s from "@/styles/layout/PageLoader.module.css";
 
 const BOOT_LINES = [
   { text: "Loading cryptographic engine",  ok: true,  delay: 380 },
@@ -38,21 +40,16 @@ export function PageLoader() {
         });
         return;
       }
-
       sessionStorage.setItem(LOADER_SEEN_KEY, "true");
       loaderResolved = true;
     } catch {
-      // If storage is unavailable, keep the loader behavior non-blocking.
       loaderResolved = true;
     }
-
     requestAnimationFrame(() => setChecked(true));
   }, []);
 
-  /* ── scramble title ─────────────────────────────────────── */
   useEffect(() => {
     if (!checked || !mounted) return;
-
     let raf: number;
     let t0: number | null = null;
     const animate = (ts: number) => {
@@ -69,20 +66,16 @@ export function PageLoader() {
     return () => { clearTimeout(id); cancelAnimationFrame(raf); };
   }, [checked, mounted]);
 
-  /* ── boot lines ─────────────────────────────────────────── */
   useEffect(() => {
     if (!checked || !mounted) return;
-
     const ids = BOOT_LINES.map((l, i) =>
       setTimeout(() => setLines(prev => [...prev, i]), l.delay)
     );
     return () => ids.forEach(clearTimeout);
   }, [checked, mounted]);
 
-  /* ── progress bar ───────────────────────────────────────── */
   useEffect(() => {
     if (!checked || !mounted) return;
-
     let raf: number;
     let t0: number | null = null;
     const update = (ts: number) => {
@@ -95,18 +88,14 @@ export function PageLoader() {
     return () => cancelAnimationFrame(raf);
   }, [checked, mounted]);
 
-  /* ── cursor blink ───────────────────────────────────────── */
   useEffect(() => {
     if (!checked || !mounted) return;
-
     const id = setInterval(() => setCursor(v => !v), 530);
     return () => clearInterval(id);
   }, [checked, mounted]);
 
-  /* ── fade + unmount ─────────────────────────────────────── */
   useEffect(() => {
     if (!checked || !mounted) return;
-
     const t1 = setTimeout(() => setVisible(false), FADE_AT);
     const t2 = setTimeout(() => setMounted(false), UNMOUNT_AT);
     return () => { clearTimeout(t1); clearTimeout(t2); };
@@ -114,145 +103,49 @@ export function PageLoader() {
 
   if (!mounted) return null;
 
-  if (!checked) {
-    return (
-      <div style={{
-        position: "fixed", inset: 0, zIndex: 9999,
-        background: "var(--bg)",
-        pointerEvents: "all",
-      }} />
-    );
-  }
+  if (!checked) return <div className={s.blocker} />;
 
   return (
-    <>
-      <style>{`
-        @keyframes _sphere-in {
-          0%   { opacity:0; transform:scale(0.55) translateY(12px); }
-          65%  { transform:scale(1.07) translateY(-4px); }
-          100% { opacity:1; transform:scale(1) translateY(0); }
-        }
-        @keyframes _line-in {
-          from { opacity:0; transform:translateX(-10px); }
-          to   { opacity:1; transform:translateX(0); }
-        }
-        @keyframes _scan {
-          0%   { transform:translateY(-100%); }
-          100% { transform:translateY(100vh); }
-        }
-        @keyframes _bar-glow {
-          0%, 100% { box-shadow: 0 0 6px var(--accent-glow); }
-          50%       { box-shadow: 0 0 16px var(--accent-glow), 0 0 32px var(--accent-border); }
-        }
-      `}</style>
+    <div
+      className={s.overlay}
+      style={{ opacity: visible ? 1 : 0, pointerEvents: visible ? "all" : "none" }}
+    >
+      <div className={s.ambient} />
+      <div className={s.scanline} />
 
-      <div style={{
-        position: "fixed", inset: 0, zIndex: 9999,
-        background: "var(--bg)",
-        display: "flex", flexDirection: "column",
-        alignItems: "center", justifyContent: "center",
-        opacity: visible ? 1 : 0,
-        transition: "opacity 0.65s cubic-bezier(0.4,0,1,1)",
-        pointerEvents: visible ? "all" : "none",
-        overflow: "hidden",
-      }}>
-
-        {/* Ambient glow */}
-        <div style={{
-          position: "absolute", inset: 0, pointerEvents: "none",
-          background: "radial-gradient(ellipse 70% 55% at 50% 50%, rgba(132,204,22,0.07) 0%, transparent 70%)",
-        }} />
-
-        {/* Scanline sweep */}
-        <div style={{
-          position: "absolute", left: 0, right: 0, height: "2px",
-          background: "linear-gradient(90deg, transparent, var(--accent-border-mid), transparent)",
-          animation: "_scan 1.8s linear forwards",
-          pointerEvents: "none", opacity: 0.6,
-        }} />
-
-        {/* Sphere */}
-        <div style={{
-          animation: "_sphere-in 0.65s cubic-bezier(0.34,1.56,0.64,1) forwards",
-          marginBottom: "18px",
-        }}>
-          <Icon.Logo size={80} />
-        </div>
-
-        {/* Title */}
-        <div style={{
-          fontFamily: "var(--font-mono)",
-          fontSize: "30px",
-          fontWeight: 700,
-          letterSpacing: "-0.02em",
-          color: "var(--accent)",
-          marginBottom: "44px",
-          display: "flex", alignItems: "baseline", gap: "2px",
-        }}>
-          <span style={{ display: "inline-block", minWidth: `${TITLE.length}ch` }}>{title}</span>
-          <span style={{ opacity: cursor ? 1 : 0, transition: "opacity 0.1s" }}>_</span>
-        </div>
-
-        {/* Terminal lines */}
-        <div style={{
-          width: "min(420px, 88vw)",
-          fontFamily: "var(--font-mono)",
-          fontSize: "12px",
-          display: "flex", flexDirection: "column", gap: "7px",
-          marginBottom: "28px",
-        }}>
-          {BOOT_LINES.map((line, i) => (
-            <div key={i} style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              opacity: lines.includes(i) ? 1 : 0,
-              animation: lines.includes(i) ? "_line-in 0.28s ease forwards" : "none",
-            }}>
-              <span style={{ color: "var(--text-muted)" }}>
-                <span style={{ color: "var(--accent)", opacity: 0.5, marginRight: "8px" }}>›</span>
-                {line.text}
-              </span>
-              {line.ok && (
-                <span style={{
-                  color: "var(--success)", fontSize: "11px",
-                  background: "var(--success-tint)", border: "1px solid var(--success-border)",
-                  borderRadius: "4px", padding: "1px 6px", flexShrink: 0,
-                }}>
-                  OK
-                </span>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* Progress bar */}
-        <div style={{
-          width: "min(420px, 88vw)", height: "2px",
-          background: "var(--border)", borderRadius: "2px", overflow: "hidden",
-        }}>
-          <div style={{
-            height: "100%",
-            width: `${progress}%`,
-            background: "linear-gradient(90deg, var(--accent), var(--accent-mid))",
-            borderRadius: "2px",
-            animation: progress > 5 ? "_bar-glow 0.9s ease-in-out infinite" : "none",
-            transition: "width 0.06s linear",
-          }} />
-        </div>
-
-        {/* Bottom label */}
-        <div style={{
-          marginTop: "14px",
-          fontFamily: "var(--font-mono)",
-          fontSize: "10px",
-          color: "var(--text-muted)",
-          opacity: 0.4,
-          letterSpacing: "0.08em",
-        }}>
-          100% CLIENT-SIDE · NO DATA LEAVES YOUR BROWSER
-        </div>
+      <div className={s.sphere}>
+        <Icon.Logo size={80} />
       </div>
-    </>
+
+      <div className={s.titleRow}>
+        <span className={s.titleText} style={{ minWidth: `${TITLE.length}ch` }}>{title}</span>
+        <span className={s.cursor} style={{ opacity: cursor ? 1 : 0 }}>_</span>
+      </div>
+
+      <div className={s.terminal}>
+        {BOOT_LINES.map((line, i) => (
+          <div
+            key={i}
+            className={s.termLine}
+            style={{ opacity: lines.includes(i) ? 1 : 0 }}
+          >
+            <span className={s.termText}>
+              <span className={s.termPrompt}>›</span>
+              {line.text}
+            </span>
+            {line.ok && <span className={s.okBadge}>OK</span>}
+          </div>
+        ))}
+      </div>
+
+      <div className={s.progressTrack}>
+        <div
+          className={clsx(s.progressBar, progress > 5 && s.progressBarGlow)}
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+
+      <div className={s.footer}>100% CLIENT-SIDE · NO DATA LEAVES YOUR BROWSER</div>
+    </div>
   );
 }

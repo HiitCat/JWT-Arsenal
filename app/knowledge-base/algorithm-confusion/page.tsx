@@ -9,7 +9,6 @@ export const metadata: Metadata = pageMeta(
   "Switch alg from RS256 to HS256 - the library treats the RSA public key as the HMAC secret, which the attacker already knows.",
   "/knowledge-base/algorithm-confusion",
 );
-import "../../globals.css";
 
 export default function Page() {
   return (

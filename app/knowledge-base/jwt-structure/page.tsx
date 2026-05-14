@@ -3,7 +3,6 @@ import { pageMeta } from "@/lib/seo";
 import { KbArticle, H2, H3, P, Mono, Ref } from "@/components/layout/KbArticle";
 import { CodeBlock } from "@/components/shared/CodeBlock";
 import { InfoCallout } from "@/components/shared/InfoCallout";
-import "../../globals.css";
 
 export const metadata: Metadata = pageMeta(
   "JWT Structure & Internals",

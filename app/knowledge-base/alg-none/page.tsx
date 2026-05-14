@@ -9,7 +9,6 @@ export const metadata: Metadata = pageMeta(
   "RFC 7518 legitimises \"none\" as a valid algorithm. Vulnerable libraries accept unsigned tokens when the header says so.",
   "/knowledge-base/alg-none",
 );
-import "../../globals.css";
 
 export default function Page() {
   return (

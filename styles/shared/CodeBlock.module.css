@@ -1,0 +1,31 @@
+.wrapper {
+  composes: panelWrapper from "@/styles/shared.module.css";
+  margin-bottom: 20px;
+}
+
+.header {
+  composes: panelHeader from "@/styles/shared.module.css";
+}
+
+.lang {
+  composes: panelHeaderLabel from "@/styles/shared.module.css";
+}
+
+.copyBtn {
+  composes: copyBtn from "@/styles/shared.module.css";
+}
+
+.copied {
+  composes: copyBtnCopied from "@/styles/shared.module.css";
+}
+
+.pre {
+  margin: 0;
+  padding: 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  overflow-x: auto;
+  white-space: pre;
+  line-height: 1.7;
+  background: transparent;
+}

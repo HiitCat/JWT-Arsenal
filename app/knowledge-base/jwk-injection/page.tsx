@@ -9,7 +9,6 @@ export const metadata: Metadata = pageMeta(
   "Embed your own RSA public key in the JWT header. A vulnerable server uses it to verify - against the attacker's own key.",
   "/knowledge-base/jwk-injection",
 );
-import "../../globals.css";
 
 export default function Page() {
   return (

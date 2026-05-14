@@ -1,0 +1,35 @@
+.wrapper {
+  composes: panelWrapper from "@/styles/shared.module.css";
+}
+
+.header {
+  composes: panelHeader from "@/styles/shared.module.css";
+}
+
+.label {
+  composes: panelHeaderLabel from "@/styles/shared.module.css";
+}
+
+.copyBtn {
+  composes: copyBtn from "@/styles/shared.module.css";
+}
+
+.copied {
+  composes: copyBtnCopied from "@/styles/shared.module.css";
+}
+
+.body {
+  padding: 12px 16px;
+}
+
+.token {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.7;
+  word-break: break-all;
+}
+
+.tokenPlain {
+  color: var(--text);
+}

@@ -1,0 +1,25 @@
+.label {
+  composes: formLabel from "@/styles/shared.module.css";
+}
+
+.textarea {
+  composes: textarea from "@/styles/shared.module.css";
+  min-height: 140px;
+  font-size: 12px;
+}
+
+.textarea:focus {
+  border-color: var(--accent);
+}
+
+.textarea.error {
+  border-color: var(--danger);
+}
+
+.textarea.error:focus {
+  border-color: var(--danger);
+}
+
+.errorMsg {
+  composes: formError from "@/styles/shared.module.css";
+}

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Copy, Check } from "lucide-react";
+import clsx from "clsx";
+import s from "@/styles/shared/CodeBlock.module.css";
 
 const C = {
   comment:     "var(--syntax-comment)",
@@ -143,61 +145,15 @@ export function CodeBlock({ code, language = "bash", label }: CodeBlockProps) {
   };
 
   return (
-    <div
-      style={{
-        background: "var(--bg)",
-        border: "1px solid var(--border)",
-        borderRadius: "var(--radius)",
-        overflow: "hidden",
-        marginBottom: "20px",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "8px 12px",
-          borderBottom: "1px solid var(--border)",
-          background: "var(--surface-overlay)",
-        }}
-      >
-        <span style={{ fontSize: "12px", color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
-          {label ?? language}
-        </span>
-        <button
-          onClick={handleCopy}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "4px",
-            padding: "4px 8px",
-            background: "transparent",
-            border: "1px solid var(--border)",
-            borderRadius: "4px",
-            cursor: "pointer",
-            color: copied ? "var(--success)" : "var(--text-muted)",
-            fontSize: "11px",
-            transition: "color 0.15s",
-          }}
-        >
+    <div className={s.wrapper}>
+      <div className={s.header}>
+        <span className={s.lang}>{label ?? language}</span>
+        <button onClick={handleCopy} className={clsx(s.copyBtn, copied && s.copied)}>
           {copied ? <Check size={11} /> : <Copy size={11} />}
           {copied ? "Copied" : "Copy"}
         </button>
       </div>
-
-      <pre
-        style={{
-          margin: 0,
-          padding: "16px",
-          fontFamily: "var(--font-mono)",
-          fontSize: "12px",
-          overflowX: "auto",
-          whiteSpace: "pre",
-          lineHeight: 1.7,
-          background: "transparent",
-        }}
-      >
+      <pre className={s.pre}>
         <code>{highlight(code, language)}</code>
       </pre>
     </div>

@@ -9,7 +9,6 @@ export const metadata: Metadata = pageMeta(
   "The kid header selects which key to use. Unsanitised, it becomes a path traversal, SQL injection, or SSRF vector.",
   "/knowledge-base/kid-injection",
 );
-import "../../globals.css";
 
 export default function Page() {
   return (

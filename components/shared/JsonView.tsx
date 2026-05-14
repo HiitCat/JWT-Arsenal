@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import s from "@/styles/shared/JsonView.module.css";
 
 const C = {
   key:         "var(--syntax-key)",
@@ -56,24 +57,8 @@ interface JsonViewProps {
 
 export function JsonView({ value, style }: JsonViewProps) {
   const lines = value.split("\n");
-
   return (
-    <pre
-      style={{
-        margin: 0,
-        padding: "10px 12px",
-        background: "var(--bg)",
-        border: "1px solid var(--border)",
-        borderRadius: "6px",
-        fontFamily: "var(--font-mono)",
-        fontSize: "11px",
-        lineHeight: 1.7,
-        overflowX: "auto",
-        whiteSpace: "pre-wrap",
-        wordBreak: "break-word",
-        ...style,
-      }}
-    >
+    <pre className={s.pre} style={style}>
       {lines.map((line, li) => (
         <span key={li}>
           {tokenizeLine(line).map((tok, ti) => (

@@ -2,6 +2,7 @@
 
 import React, { useRef } from "react";
 import { Link } from "@/components/shared/Link";
+import s from "@/styles/shared/GlowCard.module.css";
 
 export function hexToRgb(hex: string): string {
   return `${parseInt(hex.slice(1, 3), 16)}, ${parseInt(hex.slice(3, 5), 16)}, ${parseInt(hex.slice(5, 7), 16)}`;
@@ -18,15 +19,9 @@ export function GlowCard({ color, href, style, children }: GlowCardProps) {
   const rgb = hexToRgb(color);
   const spotRef = useRef<HTMLDivElement>(null);
 
-  const containerStyle: React.CSSProperties = {
-    position: "relative",
-    isolation: "isolate",
-    overflow: "hidden",
+  const dynamicStyle: React.CSSProperties = {
     border: `1px solid rgba(${rgb}, 0.18)`,
-    borderRadius: "var(--radius)",
     background: `linear-gradient(145deg, rgba(${rgb}, 0.04) 0%, var(--bg-elevated) 60%)`,
-    transition: "border-color 0.15s, box-shadow 0.15s",
-    textDecoration: "none",
     ...style,
   };
 
@@ -55,22 +50,18 @@ export function GlowCard({ color, href, style, children }: GlowCardProps) {
 
   const overlays = (
     <>
-      {/* Spotlight - z-index:-1 stays below in-flow content within isolated context */}
-      <div
-        ref={spotRef}
-        aria-hidden
-        style={{ position: "absolute", inset: 0, zIndex: -1, opacity: 0, transition: "opacity 0.2s", pointerEvents: "none" }}
-      />
-      {/* Corner glow */}
+      <div ref={spotRef} aria-hidden className={s.spotlight} />
       <div
         aria-hidden
-        style={{ position: "absolute", top: 0, right: 0, width: "120px", height: "80px", zIndex: -1, background: `radial-gradient(ellipse at top right, rgba(${rgb}, 0.07) 0%, transparent 70%)`, pointerEvents: "none" }}
+        className={s.cornerGlow}
+        style={{ background: `radial-gradient(ellipse at top right, rgba(${rgb}, 0.07) 0%, transparent 70%)` }}
       />
     </>
   );
 
   const sharedProps = {
-    style: containerStyle,
+    className: s.card,
+    style: dynamicStyle,
     onMouseMove: handleMouseMove,
     onMouseEnter: handleMouseEnter,
     onMouseLeave: handleMouseLeave,

@@ -12,7 +12,6 @@ import { JwtParts, formatTimestamp, isExpired, STANDARD_CLAIMS } from "@/lib/jwt
 import { verifyHmacSignature } from "@/lib/crypto";
 import { JWT_EXAMPLES } from "@/lib/jwtExamples";
 import { TOPIC_COLORS, JWT_PART_COLORS } from "@/lib/colors";
-import "../globals.css";
 import { Mono } from "@/components/shared/Mono";
 
 const DEFAULT_EXAMPLE = JWT_EXAMPLES.find((example) => example.alg === "HS256") ?? JWT_EXAMPLES[0];

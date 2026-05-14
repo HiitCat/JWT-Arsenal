@@ -9,7 +9,6 @@ export const metadata: Metadata = pageMeta(
   "Recover the RSA public key from two signatures via GCD - without server access - then chain to algorithm confusion.",
   "/knowledge-base/public-key-recovery",
 );
-import "../../globals.css";
 
 export default function Page() {
   return (

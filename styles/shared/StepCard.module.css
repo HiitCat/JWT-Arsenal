@@ -1,0 +1,33 @@
+.card {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.badge {
+  composes: accentBadge from "@/styles/shared.module.css";
+  width: 32px;
+  height: 32px;
+  font-size: 13px;
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.content {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}

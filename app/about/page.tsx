@@ -11,7 +11,6 @@ export const metadata: Metadata = pageMeta(
 );
 import { PageContainer } from "@/components/layout/PageContainer";
 import { InfoCallout } from "@/components/shared/InfoCallout";
-import "../globals.css";
 
 function Section({ title, icon, children }: { title: string; icon: ReactNode; children: ReactNode }) {
   return (

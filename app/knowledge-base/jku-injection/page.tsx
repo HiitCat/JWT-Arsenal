@@ -9,7 +9,6 @@ export const metadata: Metadata = pageMeta(
   "Point jku at an attacker-controlled JWKS endpoint. The server fetches and trusts it for verification.",
   "/knowledge-base/jku-injection",
 );
-import "../../globals.css";
 
 export default function Page() {
   return (

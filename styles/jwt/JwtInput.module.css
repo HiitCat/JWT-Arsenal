@@ -1,0 +1,65 @@
+.label {
+  composes: formLabel from "@/styles/shared.module.css";
+}
+
+.wrapper {
+  position: relative;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color 0.15s;
+}
+
+.wrapper:focus-within {
+  border-color: var(--accent);
+}
+
+.wrapper.error {
+  border-color: var(--danger);
+}
+
+.wrapper.error:focus-within {
+  border-color: var(--danger);
+}
+
+.colorLayer {
+  padding: 12px 16px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-wrap: break-word;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+  overflow: hidden;
+  border-radius: var(--radius);
+  z-index: 0;
+}
+
+.textarea {
+  padding: 12px 16px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-wrap: break-word;
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  min-height: 120px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius);
+  caret-color: var(--text);
+  resize: vertical;
+  outline: none;
+}
+
+.errorMsg {
+  composes: formError from "@/styles/shared.module.css";
+}

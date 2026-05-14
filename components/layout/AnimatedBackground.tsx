@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import s from "@/styles/layout/AnimatedBackground.module.css";
 
 interface Particle {
   x: number;
@@ -64,7 +65,6 @@ export function AnimatedBackground() {
         else if (p.y > canvas.height + 10) p.y = -10;
       }
 
-      // Lines between nearby particles
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const a = particles[i];
@@ -87,11 +87,9 @@ export function AnimatedBackground() {
         }
       }
 
-      // Dots
       for (const p of particles) {
         const pulseScale = 1 + Math.sin(p.pulse) * 0.25;
         if (p.lime) {
-          // Glow halo for lime particles
           const haloR = p.r * 3.5 * pulseScale;
           const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, haloR);
           grd.addColorStop(0, `rgba(${LIME}, 0.18)`);
@@ -113,33 +111,16 @@ export function AnimatedBackground() {
       animId = requestAnimationFrame(draw);
     };
 
-    const handleResize = () => {
-      resize();
-    };
-
     resize();
     init();
     draw();
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", resize);
     return () => {
       cancelAnimationFrame(animId);
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", resize);
     };
   }, []);
 
-  return (
-    <canvas
-      ref={canvasRef}
-      aria-hidden="true"
-      style={{
-        position: "fixed",
-        inset: 0,
-        width: "100%",
-        height: "100%",
-        zIndex: 0,
-        pointerEvents: "none",
-      }}
-    />
-  );
+  return <canvas ref={canvasRef} aria-hidden="true" className={s.canvas} />;
 }

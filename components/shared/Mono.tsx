@@ -1,9 +1,6 @@
 import React from "react";
+import s from "@/styles/shared/Mono.module.css";
 
 export function Mono({ children }: { children: React.ReactNode }) {
-  return (
-    <code style={{ fontFamily: "var(--font-mono)", fontSize: "13px", color: "var(--accent)", background: "var(--accent-faint)", padding: "1px 5px", borderRadius: "4px" }}>
-      {children}
-    </code>
-  );
+  return <code className={s.mono}>{children}</code>;
 }

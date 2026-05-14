@@ -2,6 +2,8 @@
 
 import { useMemo, useEffect } from "react";
 import { decodeJwt, JwtParts } from "@/lib/jwt";
+import clsx from "clsx";
+import s from "@/styles/jwt/JwtInput.module.css";
 
 const COLORS = {
   header:    "var(--jwt-header)",
@@ -22,7 +24,7 @@ function ColorizedJwt({ value }: { value: string }) {
       <span style={{ color: COLORS.header }}>{header}</span>
       <span style={{ color: COLORS.dot }}>.</span>
       <span style={{ color: COLORS.payload }}>{payload}</span>
-      {(signature !== undefined) && (
+      {signature !== undefined && (
         <>
           <span style={{ color: COLORS.dot }}>.</span>
           <span style={{ color: COLORS.signature }}>{signature}</span>
@@ -54,81 +56,23 @@ export function JwtInput({ value, onChange, onParsed, placeholder, label }: JwtI
     onParsed?.(parsed);
   }, [parsed, onParsed]);
 
-  const borderColor = error ? "var(--danger)" : "var(--border)";
-  const sharedStyle: React.CSSProperties = {
-    padding: "12px 16px",
-    fontFamily: "var(--font-mono)",
-    fontSize: "13px",
-    lineHeight: 1.6,
-    whiteSpace: "pre-wrap",
-    wordBreak: "break-all",
-    overflowWrap: "break-word",
-  };
-
   return (
     <div>
-      {label && (
-        <label style={{ display: "block", fontSize: "13px", fontWeight: 500, color: "var(--text-muted)", marginBottom: "8px" }}>
-          {label}
-        </label>
-      )}
-      <div
-        style={{
-          position: "relative",
-          background: "var(--bg)",
-          border: `1px solid ${borderColor}`,
-          borderRadius: "var(--radius)",
-          transition: "border-color 0.15s",
-        }}
-      >
-        {/* Colored text layer behind the textarea */}
-        <div
-          aria-hidden
-          style={{
-            ...sharedStyle,
-            position: "absolute",
-            inset: 0,
-            pointerEvents: "none",
-            userSelect: "none",
-            overflow: "hidden",
-            borderRadius: "var(--radius)",
-            zIndex: 0,
-          }}
-        >
+      {label && <label className={s.label}>{label}</label>}
+      <div className={clsx(s.wrapper, error && s.error)}>
+        <div aria-hidden className={s.colorLayer}>
           {value ? <ColorizedJwt value={value} /> : null}
         </div>
-
         <textarea
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder ?? "Paste JWT token here - eyJ..."}
           spellCheck={false}
-          style={{
-            ...sharedStyle,
-            position: "relative",
-            zIndex: 1,
-            display: "block",
-            width: "100%",
-            minHeight: "120px",
-            background: "transparent",
-            border: "none",
-            borderRadius: "var(--radius)",
-            color: value ? "transparent" : "var(--text-muted)",
-            caretColor: "var(--text)",
-            resize: "vertical",
-            outline: "none",
-          }}
-          onFocus={(e) => {
-            e.currentTarget.parentElement!.style.border = `1px solid ${error ? "var(--danger)" : "var(--accent)"}`;
-          }}
-          onBlur={(e) => {
-            e.currentTarget.parentElement!.style.border = `1px solid ${borderColor}`;
-          }}
+          className={s.textarea}
+          style={{ color: value ? "transparent" : "var(--text-muted)" }}
         />
       </div>
-      {error && (
-        <p style={{ fontSize: "12px", color: "var(--danger)", margin: "4px 0 0" }}>{error}</p>
-      )}
+      {error && <p className={s.errorMsg}>{error}</p>}
     </div>
   );
 }

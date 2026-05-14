@@ -3,7 +3,6 @@ import { pageMeta } from "@/lib/seo";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { CodeBlock } from "@/components/shared/CodeBlock";
 import { InfoCallout } from "@/components/shared/InfoCallout";
-import "../globals.css";
 import { Mono } from "@/components/shared/Mono";
 import { Link } from "@/components/shared/Link";
 
