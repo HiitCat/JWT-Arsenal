@@ -5,6 +5,7 @@ import { KB_TOPICS, LAB_BASE, KbTopic } from "@/lib/kbTopics";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { Icon } from "@/components/shared/Icons";
 import { Link } from "@/components/shared/Link";
+import clsx from "clsx";
 import s from "@/styles/layout/KbArticle.module.css";
 
 type IconFn = (p: { size?: number }) => React.ReactElement;
@@ -62,12 +63,12 @@ export function KbArticle({ slug, children }: KbArticleProps) {
           <p className={s.articleDesc}>{topic.description}</p>
           <div className={s.articleActions}>
             {topic.exploitHref && (
-              <Link href={topic.exploitHref} variant="unstyled" className={`${s.actionBtn} ${s.actionBtnAccent}`}>
+              <Link href={topic.exploitHref} variant="unstyled" className={clsx(s.actionBtn, s.actionBtnAccent)}>
                 <Icon.Wand size={11} /> Open exploit tool
               </Link>
             )}
             {topic.labPath && (
-              <Link href={`${LAB_BASE}/${topic.labPath}`} variant="unstyled" className={`${s.actionBtn} ${s.actionBtnMuted}`}>
+              <Link href={`${LAB_BASE}/${topic.labPath}`} variant="unstyled" className={clsx(s.actionBtn, s.actionBtnMuted)}>
                 <Icon.FlaskConical size={11} /> {topic.labName}
               </Link>
             )}
@@ -76,7 +77,7 @@ export function KbArticle({ slug, children }: KbArticleProps) {
 
         {/* Article body */}
         <div
-          className={`kb-article-body ${s.articleBody}`}
+          className={clsx("kb-article-body", s.articleBody)}
           style={{ "--topic-color": topic.color } as React.CSSProperties}
         >
           {children}
@@ -108,13 +109,13 @@ export function KbArticle({ slug, children }: KbArticleProps) {
               <Link
                 href={`/knowledge-base/${next.slug}`}
                 variant="unstyled"
-                className={`${s.navLink} ${s.navLinkNext}`}
+                className={clsx(s.navLink, s.navLinkNext)}
                 style={{ background: `${next.color}0d`, border: `1px solid ${next.color}35` }}
                 onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = `${next.color}70`; }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = `${next.color}35`; }}
               >
                 {NextIcon && <span className={s.navIcon} style={{ color: next.color }}><NextIcon size={15} /></span>}
-                <span className={`${s.navLinkLabel} ${s.navLinkLabelNext}`}>{next.title}</span>
+                <span className={clsx(s.navLinkLabel, s.navLinkLabelNext)}>{next.title}</span>
                 <span className={s.navArrow} style={{ color: next.color }}>→</span>
               </Link>
             );
