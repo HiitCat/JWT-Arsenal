@@ -11,6 +11,14 @@ export const TOPIC_COLORS = {
   publicKeyRecovery: "#22c55e",
 } as const;
 
+export const SEVERITY_COLORS = {
+  critical: "#ef4444",
+  high:     "#f97316",
+  medium:   "#f59e0b",
+  low:      "#06b6d4",
+  info:     "#8a8a93",
+} as const;
+
 export const JWT_PART_COLORS = {
   header: "#e06c75",
   payload: "#98c379",

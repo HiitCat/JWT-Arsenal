@@ -4,14 +4,9 @@ import { AlertCircle, Info, ShieldCheck, ShieldQuestion, ShieldX } from "lucide-
 import { Link } from "@/components/shared/Link";
 import { Icon } from "@/components/shared/Icons";
 import { analyzeJwt, type SecurityFinding, type Severity } from "@/lib/securityAnalysis";
+import { SEVERITY_COLORS } from "@/lib/colors";
 
-const SEVERITY_COLOR: Record<Severity, string> = {
-  critical: "#ef4444",
-  high:     "#f97316",
-  medium:   "#f59e0b",
-  low:      "#06b6d4",
-  info:     "#8a8a93",
-};
+const SEVERITY_COLOR: Record<Severity, string> = SEVERITY_COLORS;
 
 const SEVERITY_LEVELS: Severity[] = ["critical", "high", "medium", "low", "info"];
 

@@ -57,6 +57,13 @@
   --info-tint:   rgba(124, 92, 255, 0.08);
   --info-border: rgba(124, 92, 255, 0.25);
 
+  /* ── Severity (security analysis) ──────────────────────── */
+  --severity-critical: #ef4444;
+  --severity-high:     #f97316;
+  --severity-medium:   #f59e0b;
+  --severity-low:      #06b6d4;
+  --severity-info:     #8a8a93;
+
   /* ── Surface overlays (white-on-dark) ────────────────── */
   --surface-overlay:       rgba(255, 255, 255, 0.02);
   --surface-overlay-hover: rgba(255, 255, 255, 0.04);
