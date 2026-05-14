@@ -8,7 +8,7 @@ import { Link } from "@/components/shared/Link";
 
 export const metadata: Metadata = pageMeta(
   "JWT Attack Cheatsheet",
-  "Quick-reference commands for JWT attacks - jwt_tool, hashcat, john, Python snippets for alg:none, HS256 cracking, RS256→HS256 confusion, and more.",
+  "Quick-reference commands for JWT attacks - jwt_tool, hashcat, john, Python snippets for alg:none, HS256 cracking, RS256 → HS256 confusion, and more.",
   "/cheatsheet",
 );
 

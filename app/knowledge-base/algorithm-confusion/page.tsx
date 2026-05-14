@@ -5,7 +5,7 @@ import { CodeBlock } from "@/components/shared/CodeBlock";
 import { InfoCallout } from "@/components/shared/InfoCallout";
 
 export const metadata: Metadata = pageMeta(
-  "Algorithm Confusion RS256→HS256",
+  "Algorithm Confusion RS256 → HS256",
   "Switch alg from RS256 to HS256 - the library treats the RSA public key as the HMAC secret, which the attacker already knows.",
   "/knowledge-base/algorithm-confusion",
 );

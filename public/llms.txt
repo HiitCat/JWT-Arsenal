@@ -26,7 +26,7 @@ In-depth technical articles on each attack technique.
 - [JWT Structure & Internals](https://jwtarsenal.com/knowledge-base/jwt-structure): Header fields, payload claims, base64url encoding, JOSE standards.
 - [Unverified Signature](https://jwtarsenal.com/knowledge-base/unverified-signature): How and why servers skip signature verification.
 - [Algorithm None](https://jwtarsenal.com/knowledge-base/alg-none): RFC 7518 loophole, case variation bypasses, affected libraries (2015 disclosure).
-- [Algorithm Confusion](https://jwtarsenal.com/knowledge-base/algorithm-confusion): RS256→HS256 mechanics, key format details, ES256 variant, vulnerable code patterns.
+- [Algorithm Confusion](https://jwtarsenal.com/knowledge-base/algorithm-confusion): RS256 → HS256 mechanics, key format details, ES256 variant, vulnerable code patterns.
 - [KID Injection](https://jwtarsenal.com/knowledge-base/kid-injection): Path traversal, SQL injection, SSRF via the kid header.
 - [JWK Injection](https://jwtarsenal.com/knowledge-base/jwk-injection): Embedding attacker keys in the token header.
 - [JKU Injection](https://jwtarsenal.com/knowledge-base/jku-injection): JWKS endpoint hijacking and bypass techniques.
@@ -41,7 +41,7 @@ In-depth technical articles on each attack technique.
 Common questions answered:
 
 - How to exploit alg:none → https://jwtarsenal.com/exploit/alg-none
-- How to perform algorithm confusion RS256→HS256 → https://jwtarsenal.com/exploit/algorithm-confusion
+- How to perform algorithm confusion RS256 → HS256 → https://jwtarsenal.com/exploit/algorithm-confusion
 - How to recover RSA public key from two JWTs → https://jwtarsenal.com/exploit/public-key-recovery
 - JWT security testing cheatsheet → https://jwtarsenal.com/cheatsheet
 - All JWT attack techniques explained → https://jwtarsenal.com/knowledge-base

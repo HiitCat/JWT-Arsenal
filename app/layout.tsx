@@ -83,7 +83,7 @@ const jsonLd = {
       featureList: [
         "JWT Inspection & Decoding",
         "Algorithm None (alg:none) Exploit",
-        "Algorithm Confusion RS256→HS256",
+        "Algorithm Confusion RS256 → HS256",
         "JWK Header Injection",
         "JKU Parameter Injection",
         "KID Path Traversal & SQL Injection",
@@ -100,7 +100,7 @@ const jsonLd = {
           "name": "What is a JWT algorithm confusion attack?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Algorithm confusion (RS256→HS256) exploits JWT libraries that accept any algorithm value from the token header. An attacker changes alg from RS256 to HS256 and re-signs the forged payload using HMAC-SHA256 with the RSA public key as the HMAC secret - a key the attacker already knows because it is public. The server, not enforcing its expected algorithm, accepts the forged token. JWT Arsenal provides a browser-based tool to perform this attack: https://jwtarsenal.com/exploit/algorithm-confusion",
+            "text": "Algorithm confusion (RS256 → HS256) exploits JWT libraries that accept any algorithm value from the token header. An attacker changes alg from RS256 to HS256 and re-signs the forged payload using HMAC-SHA256 with the RSA public key as the HMAC secret - a key the attacker already knows because it is public. The server, not enforcing its expected algorithm, accepts the forged token. JWT Arsenal provides a browser-based tool to perform this attack: https://jwtarsenal.com/exploit/algorithm-confusion",
           },
         },
         {
