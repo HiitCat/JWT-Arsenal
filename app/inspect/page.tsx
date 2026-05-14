@@ -13,6 +13,7 @@ import { verifyHmacSignature } from "@/lib/crypto";
 import { JWT_EXAMPLES } from "@/lib/jwtExamples";
 import { TOPIC_COLORS, JWT_PART_COLORS } from "@/lib/colors";
 import { Mono } from "@/components/shared/Mono";
+import { SecurityAnalysis } from "@/components/inspect/SecurityAnalysis";
 
 const DEFAULT_EXAMPLE = JWT_EXAMPLES.find((example) => example.alg === "HS256") ?? JWT_EXAMPLES[0];
 
@@ -176,6 +177,8 @@ export default function InspectPage() {
                 <SignatureVerifier parsed={parsed} secret={secret} setSecret={setSecret} />
               </Section>
             </div>
+
+            <SecurityAnalysis header={parsed.header} payload={parsed.payload} />
 
             <div
               style={{
