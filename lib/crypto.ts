@@ -2,6 +2,12 @@
 
 import { base64UrlEncodeBytes } from "./jwt";
 
+function selectHashAlgorithm(alg: string): AlgorithmIdentifier {
+  if (alg.endsWith("384")) return "SHA-384";
+  if (alg.endsWith("512")) return "SHA-512";
+  return "SHA-256";
+}
+
 export interface RsaKeyPair {
   publicKey: CryptoKey;
   privateKey: CryptoKey;
@@ -181,11 +187,7 @@ export async function jwksToPem(input: string): Promise<string> {
     throw new Error('Expected JWKS {"keys":[...]} or single RSA JWK {"kty":"RSA",...}');
   }
 
-  let hashAlg: AlgorithmIdentifier = "SHA-256";
-  if (typeof jwk.alg === "string") {
-    if (jwk.alg.endsWith("384")) hashAlg = "SHA-384";
-    else if (jwk.alg.endsWith("512")) hashAlg = "SHA-512";
-  }
+  const hashAlg = typeof jwk.alg === "string" ? selectHashAlgorithm(jwk.alg) : "SHA-256";
 
   const cleanJwk: JsonWebKey = { kty: jwk.kty, n: jwk.n, e: jwk.e, ext: true };
   const key = await crypto.subtle.importKey(
@@ -207,9 +209,7 @@ export async function verifyHmacSignature(
   secretBytes: Uint8Array,
   alg: string
 ): Promise<boolean> {
-  let hashAlg: AlgorithmIdentifier = "SHA-256";
-  if (alg === "HS384") hashAlg = "SHA-384";
-  if (alg === "HS512") hashAlg = "SHA-512";
+  const hashAlg = selectHashAlgorithm(alg);
 
   const keyMaterial = secretBytes.byteLength === 0
     ? new Uint8Array(64).buffer

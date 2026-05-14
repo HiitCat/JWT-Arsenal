@@ -1,5 +1,11 @@
 // JWT encode/decode/sign helpers - pure client-side, no network calls
 
+function normalizeBase64Url(str: string): string {
+  const padded = str.replace(/-/g, "+").replace(/_/g, "/");
+  const pad = padded.length % 4;
+  return pad ? padded + "=".repeat(4 - pad) : padded;
+}
+
 export interface JwtParts {
   header: Record<string, unknown>;
   payload: Record<string, unknown>;
@@ -35,10 +41,7 @@ export function encodeJwt(
 }
 
 export function base64UrlDecode(str: string): string {
-  // Add padding
-  const padded = str.replace(/-/g, "+").replace(/_/g, "/");
-  const pad = padded.length % 4;
-  const paddedStr = pad ? padded + "=".repeat(4 - pad) : padded;
+  const paddedStr = normalizeBase64Url(str);
   try {
     return decodeURIComponent(
       atob(paddedStr)
@@ -52,10 +55,7 @@ export function base64UrlDecode(str: string): string {
 }
 
 export function base64UrlDecodeBytes(str: string): Uint8Array {
-  const padded = str.replace(/-/g, "+").replace(/_/g, "/");
-  const pad = padded.length % 4;
-  const paddedStr = pad ? padded + "=".repeat(4 - pad) : padded;
-  const binary = atob(paddedStr);
+  const binary = atob(normalizeBase64Url(str));
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) {
     bytes[i] = binary.charCodeAt(i);
