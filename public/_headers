@@ -1,0 +1,6 @@
+/*
+  Link: <https://jwtarsenal.com/sitemap.xml>; rel="sitemap"
+  Link: <https://jwtarsenal.com/.well-known/agent-card.json>; rel="agent-card"
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin

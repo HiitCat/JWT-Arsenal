@@ -1,0 +1,24 @@
+{
+  "name": "JWT Arsenal",
+  "description": "100% client-side JWT exploitation toolkit for pentesters, CTF players and bug bounty hunters. Forge, inspect and exploit JWT vulnerabilities directly in your browser.",
+  "url": "https://jwtarsenal.com",
+  "logo": "https://jwtarsenal.com/logo.svg",
+  "category": ["security", "pentesting", "ctf", "jwt", "web-security"],
+  "capabilities": [
+    "JWT inspection and decoding",
+    "Algorithm None exploit (alg:none)",
+    "Algorithm Confusion RS256 to HS256",
+    "JWK Header Injection",
+    "JKU Parameter Injection",
+    "KID Path Traversal and SQL Injection",
+    "RSA Public Key Recovery from two signed JWTs",
+    "Unverified signature bypass"
+  ],
+  "audience": ["pentesters", "ctf-players", "bug-bounty-hunters", "security-researchers"],
+  "source": "https://github.com/HiitCat/JWT-Arsenal",
+  "license": "MIT",
+  "privacy": "no-data-collection",
+  "contact": {
+    "github": "https://github.com/HiitCat"
+  }
+}

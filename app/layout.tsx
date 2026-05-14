@@ -91,6 +91,31 @@ const jsonLd = {
         "100% Client-Side - No Server Required",
       ],
     },
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: {
+        "@type": "ImageObject",
+        url: `${SITE_URL}/logo.svg`,
+        contentUrl: `${SITE_URL}/logo.svg`,
+      },
+      description: SITE_DESCRIPTION,
+      sameAs: [
+        "https://github.com/HiitCat/JWT-Arsenal",
+      ],
+      knowsAbout: [
+        "JSON Web Token security",
+        "JWT exploitation",
+        "Penetration testing",
+        "CTF challenges",
+        "Bug bounty hunting",
+        "Web application security",
+        "Algorithm confusion attacks",
+        "JWT forgery",
+      ],
+    },
   ],
 };
 
