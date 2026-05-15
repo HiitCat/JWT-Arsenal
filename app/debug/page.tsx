@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { Link } from "@/components/shared/Link";
-import { Clock, CheckCircle, AlertCircle, ShieldCheck, ShieldX, ShieldQuestion } from "lucide-react";
+import { Clock, Check, CheckCircle, AlertCircle, ShieldCheck, ShieldX, ShieldQuestion } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { JwtInput } from "@/components/jwt/JwtInput";
 import { JsonEditor } from "@/components/jwt/JsonEditor";
@@ -248,7 +248,7 @@ export default function InspectPage() {
                 action={
                   String(parsed.header.alg ?? "").startsWith("HS") && secret ? (
                     <SignButton
-                      parsed={parsed}
+                      rawJwt={rawJwt}
                       secret={secret}
                       onSigned={handleExternalJwtChange}
                       disabled={!headerValid || !payloadValid}
@@ -359,17 +359,18 @@ export default function InspectPage() {
   );
 }
 
-function SignButton({ parsed, secret, onSigned, disabled, disabledReason }: { parsed: JwtParts; secret: string; onSigned: (jwt: string) => void; disabled?: boolean; disabledReason?: string }) {
+function SignButton({ rawJwt, secret, onSigned, disabled, disabledReason }: { rawJwt: string; secret: string; onSigned: (jwt: string) => void; disabled?: boolean; disabledReason?: string }) {
   const [state, setState] = useState<"idle" | "signing" | "done">("idle");
   const [tooltipVisible, setTooltipVisible] = useState(false);
 
   const handleSign = async () => {
     setState("signing");
     try {
-      const alg = String(parsed.header.alg ?? "HS256");
+      const parts = decodeJwt(rawJwt);
+      const alg = String(parts.header.alg ?? "HS256");
       const secretBytes = new TextEncoder().encode(secret);
-      const sig = await signHmac(parsed.raw.header, parsed.raw.payload, secretBytes, alg);
-      onSigned(`${parsed.raw.header}.${parsed.raw.payload}.${sig}`);
+      const sig = await signHmac(parts.raw.header, parts.raw.payload, secretBytes, alg);
+      onSigned(`${parts.raw.header}.${parts.raw.payload}.${sig}`);
       setState("done");
       setTimeout(() => setState("idle"), 2000);
     } catch {
@@ -412,10 +413,10 @@ function SignButton({ parsed, secret, onSigned, disabled, disabledReason }: { pa
           gap: "5px",
           height: "22px",
           padding: "0 8px",
-          background: state === "done" ? "var(--success-tint)" : disabled ? "transparent" : "var(--accent-tint)",
-          border: `1px solid ${state === "done" ? "var(--success-border)" : disabled ? "var(--border)" : "var(--accent-border-mid)"}`,
+          background: disabled ? "transparent" : "var(--accent-tint)",
+          border: `1px solid ${disabled ? "var(--border)" : "var(--accent-border-mid)"}`,
           borderRadius: "4px",
-          color: state === "done" ? "var(--success)" : disabled ? "var(--text-muted)" : "var(--accent)",
+          color: disabled ? "var(--text-muted)" : "var(--accent)",
           fontSize: "11px",
           fontWeight: 600,
           fontFamily: "var(--font-mono)",
@@ -424,7 +425,7 @@ function SignButton({ parsed, secret, onSigned, disabled, disabledReason }: { pa
           transition: "all 0.15s",
         }}
       >
-        {state === "done" ? "Signed" : state === "signing" ? "Signing..." : "Sign JWT"}
+        {state === "done" ? <><Check size={12} />Signed</> : state === "signing" ? "Signing..." : "Sign JWT"}
       </button>
     </div>
   );
