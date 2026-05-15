@@ -52,24 +52,60 @@
   font-family: var(--font-mono);
 }
 
-/* ── Copy button ─────────────────────────────────────────── */
+/* ── Copy button (header) ────────────────────────────────── */
 
 .copyBtn {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
+  justify-content: center;
+  width: 26px;
+  height: 22px;
   background: transparent;
   border: 1px solid var(--border);
   border-radius: 4px;
   cursor: pointer;
-  font-size: 11px;
-  transition: color 0.15s;
+  transition: color 0.15s, border-color 0.15s;
   color: var(--text-muted);
+}
+
+.copyBtn:hover {
+  color: var(--text);
+  border-color: var(--border-hover);
 }
 
 .copyBtnCopied {
   color: var(--success);
+  border-color: var(--success-border);
+}
+
+/* ── Copy button (floating, for text/input blocks) ───────── */
+
+.floatCopyBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: opacity 0.15s, color 0.15s, border-color 0.15s;
+  z-index: 2;
+}
+
+.floatCopyBtn:hover {
+  color: var(--text);
+  border-color: var(--border-hover);
+}
+
+.floatCopyBtnCopied {
+  color: var(--success);
+  border-color: var(--success-border);
 }
 
 /* ── Accent badge (numbered step, section marker) ────────── */

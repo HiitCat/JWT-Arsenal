@@ -5,11 +5,10 @@ import { Link } from "@/components/shared/Link";
 import { Clock, CheckCircle, AlertCircle, ShieldCheck, ShieldX, ShieldQuestion } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { JwtInput } from "@/components/jwt/JwtInput";
-import { InfoCallout } from "@/components/shared/InfoCallout";
-import { JsonView } from "@/components/shared/JsonView";
+import { JsonEditor } from "@/components/jwt/JsonEditor";
 import { Icon } from "@/components/shared/Icons";
-import { JwtParts, formatTimestamp, isExpired, STANDARD_CLAIMS } from "@/lib/jwt";
-import { verifyHmacSignature } from "@/lib/crypto";
+import { JwtParts, formatTimestamp, isExpired, STANDARD_CLAIMS, encodeJwt, decodeJwt } from "@/lib/jwt";
+import { verifyHmacSignature, signHmac, verifyAsymmetricSignature, importJwkAsPem } from "@/lib/crypto";
 import { JWT_EXAMPLES } from "@/lib/jwtExamples";
 import { TOPIC_COLORS, JWT_PART_COLORS } from "@/lib/colors";
 import { Mono } from "@/components/shared/Mono";
@@ -37,19 +36,72 @@ function hexToRgb(hex: string) {
 export default function InspectPage() {
   const [rawJwt, setRawJwt] = useState(DEFAULT_EXAMPLE.token);
   const [secret, setSecret] = useState(DEFAULT_EXAMPLE.secret ?? "");
+  const [publicKey, setPublicKey] = useState(DEFAULT_EXAMPLE.publicKey ?? "");
   const [selectedExample, setSelectedExample] = useState(DEFAULT_EXAMPLE.label);
   const [parsed, setParsed] = useState<JwtParts | null>(null);
+  const [headerValid, setHeaderValid] = useState(true);
+  const [payloadValid, setPayloadValid] = useState(true);
+  const [headerError, setHeaderError] = useState<string | null>(null);
+  const [payloadError, setPayloadError] = useState<string | null>(null);
+
+  // editorReset tracks external JWT changes so editors remount with correct initialValue.
+  // We pre-decode synchronously to avoid timing issues with async state updates.
+  const [editorReset, setEditorReset] = useState<{
+    key: number;
+    header: Record<string, unknown>;
+    payload: Record<string, unknown>;
+  }>(() => {
+    try {
+      const parts = decodeJwt(DEFAULT_EXAMPLE.token);
+      return { key: 0, header: parts.header, payload: parts.payload };
+    } catch {
+      return { key: 0, header: {}, payload: {} };
+    }
+  });
 
   const handleParsed = useCallback((parts: JwtParts | null) => {
     setParsed(parts);
   }, []);
 
+  const updateJwtAndEditors = useCallback((token: string) => {
+    setRawJwt(token);
+    try {
+      const parts = decodeJwt(token);
+      setEditorReset(prev => ({ key: prev.key + 1, header: parts.header, payload: parts.payload }));
+    } catch { /* invalid JWT, keep current editors */ }
+  }, []);
+
+  // Called when the user pastes a token directly - clears the public key
+  const handleExternalJwtChange = useCallback((token: string) => {
+    setPublicKey("");
+    updateJwtAndEditors(token);
+  }, [updateJwtAndEditors]);
+
   const handleExampleChange = useCallback((label: string) => {
     const example = JWT_EXAMPLES.find((candidate) => candidate.label === label);
     if (!example) return;
     setSelectedExample(example.label);
-    setRawJwt(example.token);
     setSecret(example.secret ?? "");
+    setPublicKey(example.publicKey ?? "");
+    updateJwtAndEditors(example.token);
+  }, [updateJwtAndEditors]);
+
+  const handleHeaderChange = useCallback((newHeader: Record<string, unknown>) => {
+    setParsed(prev => {
+      if (!prev) return prev;
+      const newJwt = encodeJwt(newHeader, prev.payload, prev.raw.signature);
+      setRawJwt(newJwt);
+      return prev;
+    });
+  }, []);
+
+  const handlePayloadChange = useCallback((newPayload: Record<string, unknown>) => {
+    setParsed(prev => {
+      if (!prev) return prev;
+      const newJwt = encodeJwt(prev.header, newPayload, prev.raw.signature);
+      setRawJwt(newJwt);
+      return prev;
+    });
   }, []);
 
   const expired = parsed ? isExpired(parsed.payload) : false;
@@ -106,7 +158,7 @@ export default function InspectPage() {
               </select>
             </label>
           </div>
-          <JwtInput value={rawJwt} onChange={setRawJwt} onParsed={handleParsed} />
+          <JwtInput value={rawJwt} onChange={handleExternalJwtChange} onParsed={handleParsed} />
         </div>
 
         {parsed && (
@@ -143,7 +195,15 @@ export default function InspectPage() {
               }}
             >
               <Section title="Header" accent={JWT_PART_COLORS.header}>
-                <JsonDisplay obj={parsed.header} />
+                <JsonEditor
+                  key={editorReset.key}
+                  initialValue={editorReset.header}
+                  onChange={handleHeaderChange}
+                  onValidChange={(v, msg) => { setHeaderValid(v); setHeaderError(v ? null : (msg ?? "Invalid JSON")); }}
+                />
+                {headerError && (
+                  <p style={{ margin: "6px 0 0", fontSize: "11px", color: "var(--danger)", fontFamily: "var(--font-mono)" }}>{headerError}</p>
+                )}
                 <div style={{ marginTop: "12px" }}>
                   <InfoRow label="Algorithm" value={String(parsed.header.alg ?? "-")} mono />
                   <InfoRow label="Type" value={String(parsed.header.typ ?? "-")} mono />
@@ -154,7 +214,15 @@ export default function InspectPage() {
               </Section>
 
               <Section title="Payload" accent={JWT_PART_COLORS.payload}>
-                <JsonDisplay obj={parsed.payload} />
+                <JsonEditor
+                  key={editorReset.key + 10000}
+                  initialValue={editorReset.payload}
+                  onChange={handlePayloadChange}
+                  onValidChange={(v, msg) => { setPayloadValid(v); setPayloadError(v ? null : (msg ?? "Invalid JSON")); }}
+                />
+                {payloadError && (
+                  <p style={{ margin: "6px 0 0", fontSize: "11px", color: "var(--danger)", fontFamily: "var(--font-mono)" }}>{payloadError}</p>
+                )}
                 <div style={{ marginTop: "12px" }}>
                   {(STANDARD_CLAIMS as readonly string[]).map((claim) => {
                     const val = parsed.payload[claim];
@@ -174,8 +242,27 @@ export default function InspectPage() {
                 </div>
               </Section>
 
-              <Section title="Signature" accent={JWT_PART_COLORS.signature}>
-                <SignatureVerifier parsed={parsed} secret={secret} setSecret={setSecret} />
+              <Section
+                title="Signature"
+                accent={JWT_PART_COLORS.signature}
+                action={
+                  String(parsed.header.alg ?? "").startsWith("HS") && secret ? (
+                    <SignButton
+                      parsed={parsed}
+                      secret={secret}
+                      onSigned={handleExternalJwtChange}
+                      disabled={!headerValid || !payloadValid}
+                      disabledReason={
+                        !headerValid && !payloadValid ? "Header and payload contain invalid JSON"
+                        : !headerValid ? "Header contains invalid JSON"
+                        : !payloadValid ? "Payload contains invalid JSON"
+                        : undefined
+                      }
+                    />
+                  ) : undefined
+                }
+              >
+                <SignatureVerifier parsed={parsed} secret={secret} setSecret={setSecret} publicKey={publicKey} setPublicKey={setPublicKey} />
               </Section>
             </div>
 
@@ -272,95 +359,241 @@ export default function InspectPage() {
   );
 }
 
+function SignButton({ parsed, secret, onSigned, disabled, disabledReason }: { parsed: JwtParts; secret: string; onSigned: (jwt: string) => void; disabled?: boolean; disabledReason?: string }) {
+  const [state, setState] = useState<"idle" | "signing" | "done">("idle");
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+
+  const handleSign = async () => {
+    setState("signing");
+    try {
+      const alg = String(parsed.header.alg ?? "HS256");
+      const secretBytes = new TextEncoder().encode(secret);
+      const sig = await signHmac(parsed.raw.header, parsed.raw.payload, secretBytes, alg);
+      onSigned(`${parsed.raw.header}.${parsed.raw.payload}.${sig}`);
+      setState("done");
+      setTimeout(() => setState("idle"), 2000);
+    } catch {
+      setState("idle");
+    }
+  };
+
+  return (
+    <div
+      style={{ position: "relative", display: "inline-flex" }}
+      onMouseEnter={() => disabled && setTooltipVisible(true)}
+      onMouseLeave={() => setTooltipVisible(false)}
+    >
+      {tooltipVisible && disabledReason && (
+        <div style={{
+          position: "absolute",
+          bottom: "calc(100% + 6px)",
+          right: 0,
+          background: "var(--bg-elevated)",
+          border: "1px solid var(--border)",
+          borderRadius: "6px",
+          padding: "6px 10px",
+          fontSize: "11px",
+          color: "var(--danger)",
+          fontFamily: "var(--font-mono)",
+          whiteSpace: "nowrap",
+          pointerEvents: "none",
+          zIndex: 10,
+          boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+        }}>
+          {disabledReason}
+        </div>
+      )}
+      <button
+        onClick={handleSign}
+        disabled={state !== "idle" || disabled}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "5px",
+          height: "22px",
+          padding: "0 8px",
+          background: state === "done" ? "var(--success-tint)" : disabled ? "transparent" : "var(--accent-tint)",
+          border: `1px solid ${state === "done" ? "var(--success-border)" : disabled ? "var(--border)" : "var(--accent-border-mid)"}`,
+          borderRadius: "4px",
+          color: state === "done" ? "var(--success)" : disabled ? "var(--text-muted)" : "var(--accent)",
+          fontSize: "11px",
+          fontWeight: 600,
+          fontFamily: "var(--font-mono)",
+          cursor: state !== "idle" || disabled ? "default" : "pointer",
+          opacity: disabled ? 0.5 : 1,
+          transition: "all 0.15s",
+        }}
+      >
+        {state === "done" ? "Signed" : state === "signing" ? "Signing..." : "Sign JWT"}
+      </button>
+    </div>
+  );
+}
+
 function SignatureVerifier({
   parsed,
   secret,
   setSecret,
+  publicKey,
+  setPublicKey,
 }: {
   parsed: JwtParts;
   secret: string;
   setSecret: (value: string) => void;
+  publicKey: string;
+  setPublicKey: (value: string) => void;
 }) {
   const alg = String(parsed.header.alg ?? "");
   const isHmac = alg.startsWith("HS");
+  const isAsymmetric = !isHmac && alg !== "none";
+  const jku = typeof parsed.header.jku === "string" ? parsed.header.jku : null;
+  const kid = typeof parsed.header.kid === "string" ? parsed.header.kid : null;
+
   const [result, setResult] = useState<boolean | null>(null);
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fetchStatus, setFetchStatus] = useState<"idle" | "fetching" | "done" | "failed">("idle");
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
+  // HMAC verification
   useEffect(() => {
-    if (!isHmac || !secret) return;
-
+    if (!isHmac || !secret) { setResult(null); setError(null); return; }
     let cancelled = false;
-
-    async function runVerification() {
-      setVerifying(true);
-      setError(null);
+    setVerifying(true); setError(null);
+    (async () => {
       try {
-        const bytes = new TextEncoder().encode(secret);
-        const ok = await verifyHmacSignature(
-          parsed.raw.header,
-          parsed.raw.payload,
-          parsed.raw.signature,
-          bytes,
-          alg
-        );
-        if (!cancelled) {
-          setResult(ok);
-        }
+        const ok = await verifyHmacSignature(parsed.raw.header, parsed.raw.payload, parsed.raw.signature, new TextEncoder().encode(secret), alg);
+        if (!cancelled) setResult(ok);
       } catch (e) {
-        if (!cancelled) {
-          setError(e instanceof Error ? e.message : "Verification failed");
-          setResult(null);
-        }
+        if (!cancelled) { setError(e instanceof Error ? e.message : "Verification failed"); setResult(null); }
       } finally {
-        if (!cancelled) {
-          setVerifying(false);
-        }
+        if (!cancelled) setVerifying(false);
       }
-    }
-
-    runVerification();
-
-    return () => {
-      cancelled = true;
-    };
+    })();
+    return () => { cancelled = true; };
   }, [alg, isHmac, parsed.raw.header, parsed.raw.payload, parsed.raw.signature, secret]);
+
+  // Auto-fetch public key from jku when token changes
+  useEffect(() => {
+    if (!isAsymmetric || !jku) { setFetchStatus("idle"); setFetchError(null); return; }
+    let cancelled = false;
+    setFetchStatus("fetching"); setFetchError(null);
+    (async () => {
+      try {
+        const resp = await fetch(jku);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json() as Record<string, unknown>;
+        const keys = Array.isArray(data.keys) ? (data.keys as (JsonWebKey & { kid?: string })[]) : [data as JsonWebKey & { kid?: string }];
+        const jwk = (kid ? keys.find((k) => k.kid === kid) : undefined) ?? keys[0];
+        if (!jwk) throw new Error("No matching key found in JWKS");
+        const pem = await importJwkAsPem(jwk);
+        if (!cancelled) { setPublicKey(pem); setFetchStatus("done"); }
+      } catch (e) {
+        if (!cancelled) { setFetchStatus("failed"); setFetchError(e instanceof Error ? e.message : "Unknown error"); }
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [jku, kid, isAsymmetric, setPublicKey]);
+
+  // Asymmetric verification when publicKey is set
+  useEffect(() => {
+    if (!isAsymmetric || !publicKey.trim()) { if (isAsymmetric) { setResult(null); setError(null); } return; }
+    let cancelled = false;
+    setVerifying(true); setError(null);
+    (async () => {
+      try {
+        const ok = await verifyAsymmetricSignature(parsed.raw.header, parsed.raw.payload, parsed.raw.signature, alg, publicKey.trim());
+        if (!cancelled) setResult(ok);
+      } catch (e) {
+        if (!cancelled) { setError(e instanceof Error ? e.message : "Verification failed"); setResult(null); }
+      } finally {
+        if (!cancelled) setVerifying(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [alg, isAsymmetric, parsed.raw.header, parsed.raw.payload, parsed.raw.signature, publicKey]);
 
   const algFnName = alg === "HS384" ? "HMACSHA384" : alg === "HS512" ? "HMACSHA512" : "HMACSHA256";
 
-  if (!isHmac) {
+  if (isAsymmetric) {
+    const noKeyAvailable = !publicKey.trim() && fetchStatus !== "fetching";
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-        <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "4px" }}>
-          Algorithm: <Mono>{alg || "unknown"}</Mono>
+        {jku && (
+          <div style={{ fontSize: "11px", color: "var(--text-muted)", fontFamily: "var(--font-mono)", wordBreak: "break-all" }}>
+            jku: <span style={{ color: "var(--accent)" }}>{jku}</span>
+          </div>
+        )}
+
+        {fetchStatus === "fetching" && (
+          <div style={{ fontSize: "12px", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "6px" }}>
+            <ShieldQuestion size={13} /> Fetching public key from jku...
+          </div>
+        )}
+
+        {(fetchStatus === "failed" || noKeyAvailable) && (
+          <div style={{ fontSize: "11px", color: "var(--text-muted)", lineHeight: 1.5 }}>
+            {fetchStatus === "failed"
+              ? `Unable to automatically download public key from JWT (${fetchError}). Please enter the public key manually to verify the JWT signature.`
+              : "Unable to automatically download public key from JWT. Please enter the public key manually to verify the JWT signature."}
+          </div>
+        )}
+
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+            <label style={{ fontSize: "12px", fontWeight: 500, color: "var(--text-muted)" }}>
+              Public Key (PEM)
+            </label>
+            {fetchStatus === "done" && (
+              <span style={{ fontSize: "10px", fontFamily: "var(--font-mono)", color: "var(--accent)", background: "var(--accent-tint)", border: "1px solid var(--accent-border-mid)", borderRadius: "4px", padding: "1px 6px" }}>
+                auto-fetched from jku
+              </span>
+            )}
+          </div>
+          <textarea
+            value={publicKey}
+            onChange={(e) => setPublicKey(e.target.value)}
+            placeholder={"-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----"}
+            rows={5}
+            style={{
+              width: "100%",
+              padding: "8px 12px",
+              background: "var(--bg)",
+              border: "1px solid var(--border)",
+              borderRadius: "var(--radius)",
+              color: "var(--text)",
+              fontFamily: "var(--font-mono)",
+              fontSize: "10px",
+              lineHeight: 1.6,
+              outline: "none",
+              resize: "vertical",
+            }}
+            onFocus={(e) => { e.currentTarget.style.border = "1px solid var(--accent)"; }}
+            onBlur={(e) => { e.currentTarget.style.border = "1px solid var(--border)"; }}
+          />
         </div>
-        <InfoCallout variant="info">
-          Asymmetric algorithm - signature verification requires the server's public key.
-          Use{" "}
-          <Link href="/exploit/algorithm-confusion">
-            Algorithm Confusion
-          </Link>{" "}
-          to work with RS256 tokens.
-        </InfoCallout>
-        <div style={{ fontSize: "11px", color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
-          Raw signature (Base64URL):
-        </div>
-        <p
-          style={{
-            margin: 0,
-            fontFamily: "var(--font-mono)",
-            fontSize: "11px",
-            color: JWT_PART_COLORS.signature,
-            wordBreak: "break-all",
-            lineHeight: 1.6,
-            padding: "8px",
-            background: "var(--bg)",
-            borderRadius: "6px",
-            border: "1px solid var(--border)",
-          }}
-        >
-          {parsed.raw.signature || <em style={{ color: "var(--text-muted)" }}>empty</em>}
-        </p>
+
+        {publicKey.trim() && error && (
+          <div style={{ fontSize: "12px", color: "var(--danger)", display: "flex", alignItems: "center", gap: "6px" }}>
+            <ShieldX size={13} /> {error}
+          </div>
+        )}
+        {publicKey.trim() && verifying && !error && (
+          <div style={{ fontSize: "12px", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "6px" }}>
+            <ShieldQuestion size={13} /> Verifying...
+          </div>
+        )}
+        {publicKey.trim() && result === true && !verifying && (
+          <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--success)", display: "flex", alignItems: "center", gap: "6px" }}>
+            <ShieldCheck size={14} /> Signature is valid!
+          </div>
+        )}
+        {publicKey.trim() && result === false && !error && !verifying && (
+          <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--danger)", display: "flex", alignItems: "center", gap: "6px" }}>
+            <ShieldX size={14} /> Signature is invalid.
+          </div>
+        )}
+
       </div>
     );
   }
@@ -394,7 +627,7 @@ function SignatureVerifier({
 
       <div>
         <label style={{ display: "block", fontSize: "12px", fontWeight: 500, color: "var(--text-muted)", marginBottom: "6px" }}>
-          Secret (UTF-8)
+          Secret
         </label>
         <input
           value={secret}
@@ -415,9 +648,6 @@ function SignatureVerifier({
           onFocus={(e) => { e.currentTarget.style.border = "1px solid var(--accent)"; }}
           onBlur={(e) => { e.currentTarget.style.border = "1px solid var(--border)"; }}
         />
-        <div style={{ marginTop: "6px", fontSize: "11px", color: "var(--text-muted)" }}>
-          Verification runs automatically when the secret changes.
-        </div>
       </div>
 
       {secret && error && (
@@ -525,28 +755,25 @@ function TimingTimeline({ payload }: { payload: Record<string, unknown> }) {
   );
 }
 
-function Section({ title, accent, children }: { title: string; accent: string; children: React.ReactNode }) {
+function Section({ title, accent, children, action }: { title: string; accent: string; children: React.ReactNode; action?: React.ReactNode }) {
   return (
     <div
       style={{
         background: "var(--bg-elevated)",
         border: `1px solid ${accent}33`,
         borderRadius: "var(--radius)",
-        overflow: "hidden",
         display: "flex",
         flexDirection: "column",
+        minWidth: 0,
       }}
     >
-      <div style={{ padding: "10px 16px", borderBottom: `1px solid ${accent}22`, background: `${accent}0a` }}>
+      <div style={{ padding: "10px 16px", borderBottom: `1px solid ${accent}22`, background: `${accent}0a`, borderRadius: "var(--radius) var(--radius) 0 0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <span style={{ fontSize: "12px", fontWeight: 700, color: accent, letterSpacing: "0.05em", textTransform: "uppercase" }}>{title}</span>
+        {action}
       </div>
       <div style={{ padding: "16px", flex: 1 }}>{children}</div>
     </div>
   );
-}
-
-function JsonDisplay({ obj }: { obj: Record<string, unknown> }) {
-  return <JsonView value={JSON.stringify(obj, null, 2)} />;
 }
 
 function InfoRow({
@@ -566,14 +793,13 @@ function InfoRow({
     <div
       style={{
         display: "flex",
-        justifyContent: "space-between",
         alignItems: "center",
         padding: "4px 0",
         borderBottom: "1px solid var(--border)",
         gap: "8px",
       }}
     >
-      <span style={{ fontSize: "12px", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "4px", flexShrink: 0 }}>
+      <span style={{ fontSize: "12px", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "4px", flexShrink: 0, width: "80px" }}>
         {icon}{label}
       </span>
       <span
@@ -581,9 +807,11 @@ function InfoRow({
           fontSize: "12px",
           fontFamily: mono ? "var(--font-mono)" : undefined,
           color: highlight === "danger" ? "var(--danger)" : "var(--text)",
+          flex: 1,
           textAlign: "right",
-          wordBreak: "break-all",
-          maxWidth: "60%",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
         }}
       >
         {value}

@@ -11,3 +11,19 @@
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+.wrapper {
+  position: relative;
+}
+
+.floatBtn {
+  composes: floatCopyBtn from "@/styles/shared.module.css";
+  top: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+}
+
+.copied {
+  composes: floatCopyBtnCopied from "@/styles/shared.module.css";
+}

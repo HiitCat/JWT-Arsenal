@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Copy, Check } from "lucide-react";
 import clsx from "clsx";
-import s from "@/styles/jwt/PayloadEditor.module.css";
+import s from "@/styles/jwt/JsonEditor.module.css";
 
 const C = {
   key:         "var(--syntax-key)",
@@ -58,59 +58,63 @@ function ColorizedJson({ value }: { value: string }) {
   );
 }
 
-interface PayloadEditorProps {
+interface JsonEditorProps {
   initialValue: Record<string, unknown>;
   onChange: (value: Record<string, unknown>) => void;
-  label?: string;
+  onValidChange?: (valid: boolean, errorMsg?: string) => void;
 }
 
-export function PayloadEditor({ initialValue, onChange, label }: PayloadEditorProps) {
+function parseErrorMessage(e: unknown): string {
+  if (!(e instanceof SyntaxError)) return "Invalid JSON";
+  return e.message
+    .replace(/^JSON\.parse:\s*/i, "")
+    .replace(/\s*at\s+(line\s+\d+\s+column\s+\d+[^)]*|\d+)\s*$/i, "")
+    .replace(/^Unexpected\b/, "Unexpected character -")
+    .trim();
+}
+
+export function JsonEditor({ initialValue, onChange, onValidChange }: JsonEditorProps) {
   const [text, setText] = useState(() => JSON.stringify(initialValue, null, 2));
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(false);
   const [copied, setCopied] = useState(false);
+  const colorLayerRef = useRef<HTMLDivElement>(null);
 
   const handleChange = (raw: string) => {
     setText(raw);
     try {
       onChange(JSON.parse(raw));
-      setError(null);
-    } catch {
-      setError("Invalid JSON");
+      if (error) { setError(false); onValidChange?.(true); }
+    } catch (e) {
+      if (!error) { setError(true); }
+      onValidChange?.(false, parseErrorMessage(e));
     }
   };
 
   const handleCopy = async () => {
-    if (!text.trim()) return;
     await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <div>
-      {label && <label className={s.label}>{label}</label>}
-      <div className={clsx(s.wrapper, error && s.error)}>
-        <div aria-hidden className={s.colorLayer}>
-          <ColorizedJson value={text} />
-        </div>
-        <textarea
-          value={text}
-          onChange={(e) => handleChange(e.target.value)}
-          spellCheck={false}
-          className={s.textarea}
-          style={{ color: "transparent", caretColor: "var(--text)" }}
-        />
-        {text && (
-          <button
-            onClick={handleCopy}
-            className={clsx(s.floatBtn, copied && s.copied)}
-            title={copied ? "Copied!" : "Copy"}
-          >
-            {copied ? <Check size={12} /> : <Copy size={12} />}
-          </button>
-        )}
+    <div className={clsx(s.wrapper, error && s.error)}>
+      <div aria-hidden ref={colorLayerRef} className={s.colorLayer}>
+        <ColorizedJson value={text} />
       </div>
-      {error && <p className={s.errorMsg}>{error}</p>}
+      <textarea
+        value={text}
+        onChange={(e) => handleChange(e.target.value)}
+        spellCheck={false}
+        className={s.textarea}
+        style={{ color: "transparent", caretColor: "var(--text)" }}
+      />
+      <button
+        onClick={handleCopy}
+        className={clsx(s.floatBtn, copied && s.copied)}
+        title={copied ? "Copied!" : "Copy"}
+      >
+        {copied ? <Check size={12} /> : <Copy size={12} />}
+      </button>
     </div>
   );
 }

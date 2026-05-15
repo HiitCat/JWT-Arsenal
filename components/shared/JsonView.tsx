@@ -1,6 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import { Copy, Check } from "lucide-react";
+import clsx from "clsx";
 import s from "@/styles/shared/JsonView.module.css";
 
 const C = {
@@ -53,11 +55,20 @@ function tokenizeLine(line: string): Array<{ text: string; color: string }> {
 interface JsonViewProps {
   value: string;
   style?: React.CSSProperties;
+  copyable?: boolean;
 }
 
-export function JsonView({ value, style }: JsonViewProps) {
+export function JsonView({ value, style, copyable }: JsonViewProps) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(value);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const lines = value.split("\n");
-  return (
+  const pre = (
     <pre className={s.pre} style={style}>
       {lines.map((line, li) => (
         <span key={li}>
@@ -68,5 +79,20 @@ export function JsonView({ value, style }: JsonViewProps) {
         </span>
       ))}
     </pre>
+  );
+
+  if (!copyable) return pre;
+
+  return (
+    <div className={s.wrapper}>
+      {pre}
+      <button
+        onClick={handleCopy}
+        className={clsx(s.floatBtn, copied && s.copied)}
+        title={copied ? "Copied!" : "Copy"}
+      >
+        {copied ? <Check size={12} /> : <Copy size={12} />}
+      </button>
+    </div>
   );
 }

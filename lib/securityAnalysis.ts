@@ -36,7 +36,7 @@ export function analyzeJwt(
     findings.push({
       id: "alg-symmetric", severity: "medium",
       title: `Symmetric algorithm (${alg})`,
-      detail: `HMAC secrets can be brute-forced offline (hashcat mode 16500). The signing key and verification key are identical - a leak on either side fully compromises all tokens.`,
+      detail: `HMAC secrets can be brute-forced offline (hashcat mode 16500).`,
     });
   } else if (["RS256", "RS384", "RS512", "ES256", "ES384", "ES512", "PS256", "PS384", "PS512"].includes(alg)) {
     const hmacAlg = `HS${alg.slice(2)}`;

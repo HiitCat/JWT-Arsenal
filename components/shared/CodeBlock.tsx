@@ -133,9 +133,10 @@ interface CodeBlockProps {
   code: string;
   language?: string;
   label?: string;
+  copyable?: boolean;
 }
 
-export function CodeBlock({ code, language = "bash", label }: CodeBlockProps) {
+export function CodeBlock({ code, language = "bash", label, copyable = true }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -148,10 +149,15 @@ export function CodeBlock({ code, language = "bash", label }: CodeBlockProps) {
     <div className={s.wrapper}>
       <div className={s.header}>
         <span className={s.lang}>{label ?? language}</span>
-        <button onClick={handleCopy} className={clsx(s.copyBtn, copied && s.copied)}>
-          {copied ? <Check size={11} /> : <Copy size={11} />}
-          {copied ? "Copied" : "Copy"}
-        </button>
+        {copyable && (
+          <button
+            onClick={handleCopy}
+            className={clsx(s.copyBtn, copied && s.copied)}
+            title={copied ? "Copied!" : "Copy"}
+          >
+            {copied ? <Check size={12} /> : <Copy size={12} />}
+          </button>
+        )}
       </div>
       <pre className={s.pre}>
         <code>{highlight(code, language)}</code>

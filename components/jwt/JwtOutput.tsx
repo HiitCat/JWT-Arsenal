@@ -26,9 +26,12 @@ export function JwtOutput({ token, label }: JwtOutputProps) {
     <div className={s.wrapper}>
       <div className={s.header}>
         <span className={s.label}>{label ?? "Forged JWT"}</span>
-        <button onClick={handleCopy} className={clsx(s.copyBtn, copied && s.copied)}>
-          {copied ? <Check size={11} /> : <Copy size={11} />}
-          {copied ? "Copied!" : "Copy"}
+        <button
+          onClick={handleCopy}
+          className={clsx(s.copyBtn, copied && s.copied)}
+          title={copied ? "Copied!" : "Copy"}
+        >
+          {copied ? <Check size={12} /> : <Copy size={12} />}
         </button>
       </div>
       <div className={s.body}>

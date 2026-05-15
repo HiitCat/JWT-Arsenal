@@ -3,9 +3,9 @@ export const SITE_NAME        = "JWT Arsenal";
 export const SITE_DESCRIPTION = "100% client-side JWT exploitation toolkit for pentesters, CTF players and bug bounty hunters. Forge, debug and exploit JWT vulnerabilities directly in your browser.";
 export const OG_IMAGE         = `${SITE_URL}/opengraph-image`;
 
-/** Build a page-level title: "Page Name | JWT Arsenal" */
+/** Build a page-level title: "Page Name - JWT Arsenal" */
 export function pageTitle(name: string) {
-  return `${name} | ${SITE_NAME}`;
+  return `${name} - ${SITE_NAME}`;
 }
 
 /** Build full Metadata object for a page */
@@ -13,7 +13,7 @@ export function pageMeta(title: string, description: string, path = "") {
   const url      = `${SITE_URL}${path}`;
   const fullTitle = pageTitle(title);
   return {
-    title: fullTitle,
+    title,
     description,
     alternates: { canonical: url },
     openGraph: {

@@ -15,9 +15,9 @@ const payload = {
 };
 
 const hmacSecrets = {
-  HS256: "jwt-arsenal-hs256-secret-example-32-bytes-min",
-  HS384: "jwt-arsenal-hs384-secret-example-that-is-long-enough-for-demo",
-  HS512: "jwt-arsenal-hs512-secret-example-that-is-deliberately-much-longer-for-demo-use",
+  HS256: "my-hs256-secret",
+  HS384: "my-hs384-secret",
+  HS512: "my-hs512-secret",
 };
 
 function encodeBase64UrlJson(value) {

@@ -15,12 +15,19 @@ export interface JwtParts {
 
 export function decodeJwt(token: string): JwtParts {
   const parts = token.trim().split(".");
-  if (parts.length !== 3) throw new Error("Invalid JWT: expected 3 parts separated by dots");
+  if (parts.length !== 3) throw new Error("Expected 3 parts separated by dots");
 
   const [rawHeader, rawPayload, rawSig] = parts;
 
-  const header = JSON.parse(base64UrlDecode(rawHeader));
-  const payload = JSON.parse(base64UrlDecode(rawPayload));
+  let headerStr: string;
+  try { headerStr = base64UrlDecode(rawHeader); } catch { throw new Error("Header is not valid base64url"); }
+  let header: Record<string, unknown>;
+  try { header = JSON.parse(headerStr); } catch { throw new Error("Header is not valid JSON"); }
+
+  let payloadStr: string;
+  try { payloadStr = base64UrlDecode(rawPayload); } catch { throw new Error("Payload is not valid base64url"); }
+  let payload: Record<string, unknown>;
+  try { payload = JSON.parse(payloadStr); } catch { throw new Error("Payload is not valid JSON"); }
 
   return {
     header,

@@ -1,12 +1,8 @@
-.label {
-  composes: formLabel from "@/styles/shared.module.css";
-}
-
 .wrapper {
   position: relative;
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: 6px;
   transition: border-color 0.15s;
 }
 
@@ -18,59 +14,51 @@
   border-color: var(--danger);
 }
 
-.wrapper.error:focus-within {
-  border-color: var(--danger);
+.wrapper:hover .floatBtn {
+  opacity: 1;
 }
 
+/* In-flow: détermine la hauteur du wrapper */
 .colorLayer {
-  padding: 12px 16px;
+  padding: 10px 12px;
   font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 1.6;
+  font-size: 11px;
+  line-height: 1.7;
   white-space: pre-wrap;
-  word-break: break-all;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  pointer-events: none;
+  user-select: none;
+  border-radius: 6px;
+  visibility: visible;
+}
+
+/* Overlay absolu par-dessus le colorLayer */
+.textarea {
+  padding: 10px 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
   overflow-wrap: break-word;
   position: absolute;
   inset: 0;
-  pointer-events: none;
-  user-select: none;
-  overflow: hidden;
-  border-radius: var(--radius);
-  z-index: 0;
-}
-
-.textarea {
-  padding: 12px 16px;
-  font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  word-break: break-all;
-  overflow-wrap: break-word;
-  position: relative;
-  z-index: 1;
-  display: block;
-  width: 100%;
-  min-height: 120px;
   background: transparent;
   border: none;
-  border-radius: var(--radius);
-  caret-color: var(--text);
-  resize: vertical;
+  border-radius: 6px;
+  resize: none;
   outline: none;
-}
-
-.errorMsg {
-  composes: formError from "@/styles/shared.module.css";
-}
-
-.wrapper:hover .floatBtn {
-  opacity: 1;
+  overflow: hidden;
 }
 
 .floatBtn {
   composes: floatCopyBtn from "@/styles/shared.module.css";
   opacity: 0;
+  top: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
 }
 
 .copied {

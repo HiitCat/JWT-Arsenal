@@ -1,6 +1,6 @@
 // Web Crypto API helpers - RSA/EC key generation, HMAC signing, etc.
 
-import { base64UrlEncodeBytes } from "./jwt";
+import { base64UrlEncodeBytes, base64UrlDecodeBytes } from "./jwt";
 
 function selectHashAlgorithm(alg: string): AlgorithmIdentifier {
   if (alg.endsWith("384")) return "SHA-384";
@@ -199,6 +199,78 @@ export async function jwksToPem(input: string): Promise<string> {
   );
   const der = await crypto.subtle.exportKey("spki", key);
   return derToPem(der, "PUBLIC KEY");
+}
+
+export async function importJwkAsPem(jwk: JsonWebKey): Promise<string> {
+  let algorithm: RsaHashedImportParams | EcKeyImportParams | Algorithm;
+  if (jwk.kty === "RSA") {
+    const hash = typeof jwk.alg === "string" ? selectHashAlgorithm(jwk.alg) : "SHA-256";
+    const name = typeof jwk.alg === "string" && jwk.alg.startsWith("PS") ? "RSA-PSS" : "RSASSA-PKCS1-v1_5";
+    algorithm = { name, hash };
+  } else if (jwk.kty === "EC") {
+    algorithm = { name: "ECDSA", namedCurve: jwk.crv ?? "P-256" };
+  } else if (jwk.kty === "OKP") {
+    algorithm = { name: "Ed25519" };
+  } else {
+    throw new Error(`Unsupported key type: ${jwk.kty}`);
+  }
+  const key = await crypto.subtle.importKey("jwk", { ...jwk, ext: true }, algorithm, true, ["verify"]);
+  const der = await crypto.subtle.exportKey("spki", key);
+  return derToPem(der, "PUBLIC KEY");
+}
+
+export async function verifyAsymmetricSignature(
+  rawHeader: string,
+  rawPayload: string,
+  rawSignature: string,
+  alg: string,
+  publicKeyPem: string
+): Promise<boolean> {
+  const data = new TextEncoder().encode(`${rawHeader}.${rawPayload}`);
+  const sigRaw = base64UrlDecodeBytes(rawSignature);
+  const sigBytes = sigRaw.buffer.slice(sigRaw.byteOffset, sigRaw.byteOffset + sigRaw.byteLength) as ArrayBuffer;
+  const der = pemToDer(publicKeyPem);
+
+  let key: CryptoKey;
+  let verifyParams: AlgorithmIdentifier | RsaPssParams | EcdsaParams;
+
+  if (alg.startsWith("RS")) {
+    const hash = selectHashAlgorithm(alg);
+    key = await crypto.subtle.importKey("spki", der, { name: "RSASSA-PKCS1-v1_5", hash }, false, ["verify"]);
+    verifyParams = "RSASSA-PKCS1-v1_5";
+  } else if (alg.startsWith("PS")) {
+    const hash = selectHashAlgorithm(alg);
+    const saltLength = alg === "PS384" ? 48 : alg === "PS512" ? 64 : 32;
+    key = await crypto.subtle.importKey("spki", der, { name: "RSA-PSS", hash }, false, ["verify"]);
+    verifyParams = { name: "RSA-PSS", saltLength };
+  } else if (alg.startsWith("ES")) {
+    const crv = alg === "ES384" ? "P-384" : alg === "ES512" ? "P-521" : "P-256";
+    const hash = selectHashAlgorithm(alg);
+    key = await crypto.subtle.importKey("spki", der, { name: "ECDSA", namedCurve: crv }, false, ["verify"]);
+    verifyParams = { name: "ECDSA", hash };
+  } else if (alg === "EdDSA") {
+    key = await crypto.subtle.importKey("spki", der, { name: "Ed25519" }, false, ["verify"]);
+    verifyParams = { name: "Ed25519" };
+  } else {
+    throw new Error(`Unsupported algorithm: ${alg}`);
+  }
+
+  return crypto.subtle.verify(verifyParams, key, sigBytes, data);
+}
+
+export async function signHmac(
+  rawHeader: string,
+  rawPayload: string,
+  secretBytes: Uint8Array,
+  alg: string
+): Promise<string> {
+  const hashAlg = selectHashAlgorithm(alg);
+  const keyMaterial = secretBytes.byteLength === 0
+    ? new Uint8Array(64).buffer
+    : secretBytes.buffer.slice(secretBytes.byteOffset, secretBytes.byteOffset + secretBytes.byteLength) as ArrayBuffer;
+  const key = await crypto.subtle.importKey("raw", keyMaterial, { name: "HMAC", hash: hashAlg }, false, ["sign"]);
+  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(`${rawHeader}.${rawPayload}`));
+  return base64UrlEncodeBytes(new Uint8Array(sig));
 }
 
 // Verify an HMAC-signed JWT against a known secret

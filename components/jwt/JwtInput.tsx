@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { Copy, Check } from "lucide-react";
 import { decodeJwt, JwtParts } from "@/lib/jwt";
 import clsx from "clsx";
 import s from "@/styles/jwt/JwtInput.module.css";
@@ -43,6 +44,15 @@ interface JwtInputProps {
 }
 
 export function JwtInput({ value, onChange, onParsed, placeholder, label }: JwtInputProps) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    if (!value.trim()) return;
+    await navigator.clipboard.writeText(value.trim());
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const { parsed, error } = useMemo(() => {
     if (!value.trim()) return { parsed: null, error: null };
     try {
@@ -71,6 +81,15 @@ export function JwtInput({ value, onChange, onParsed, placeholder, label }: JwtI
           className={s.textarea}
           style={{ color: value ? "transparent" : "var(--text-muted)" }}
         />
+        {value && (
+          <button
+            onClick={handleCopy}
+            className={clsx(s.floatBtn, copied && s.copied)}
+            title={copied ? "Copied!" : "Copy"}
+          >
+            {copied ? <Check size={12} /> : <Copy size={12} />}
+          </button>
+        )}
       </div>
       {error && <p className={s.errorMsg}>{error}</p>}
     </div>
