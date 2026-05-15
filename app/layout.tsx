@@ -48,11 +48,7 @@ export const metadata: Metadata = {
       alt: `${SITE_NAME} - Offensive JWT Toolkit`,
     }],
   },
-  icons: {
-    icon: "/icon",
-    shortcut: "/icon",
-    apple: "/icon",
-  },
+  icons: { icon: "/icon" },
   robots: {
     index: true,
     follow: true,
@@ -69,7 +65,7 @@ const jsonLd = {
       url: SITE_URL,
       name: SITE_NAME,
       description: SITE_DESCRIPTION,
-      potentialAction: { "@type": "SearchAction", target: `${SITE_URL}/inspect?jwt={query}`, "query-input": "required name=query" },
+      potentialAction: { "@type": "SearchAction", target: `${SITE_URL}/debug?jwt={query}`, "query-input": "required name=query" },
     },
     {
       "@type": "SoftwareApplication",
@@ -81,7 +77,7 @@ const jsonLd = {
       operatingSystem: "Any (browser-based)",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
       featureList: [
-        "JWT Inspection & Decoding",
+        "JWT Debugging & Decoding",
         "Algorithm None (alg:none) Exploit",
         "Algorithm Confusion RS256 → HS256",
         "JWK Header Injection",

@@ -129,11 +129,11 @@ export default function HomePage() {
           }}
         >
           A client-side JWT exploitation toolkit for pentesters, bug bounty hunters, and CTF players.
-          Inspect tokens, forge exploits, and understand JWT vulnerabilities - all in your browser.
+          Debug tokens, forge exploits, and understand JWT vulnerabilities - all in your browser.
         </p>
         <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
           <Link
-            href="/inspect"
+            href="/debug"
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -150,7 +150,7 @@ export default function HomePage() {
             }}
           >
             <Icon.Search size={14} />
-            Inspect a JWT
+            Debug a JWT
           </Link>
           <Link
             href="/cheatsheet"
@@ -278,7 +278,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Inspect CTA */}
+      {/* Debug CTA */}
       <div
         style={{
           display: "flex",
@@ -295,14 +295,14 @@ export default function HomePage() {
       >
         <div>
           <div style={{ fontSize: "16px", fontWeight: 600, color: "var(--text)", marginBottom: "4px" }}>
-            Start by inspecting a token
+            Start by debugging a token
           </div>
           <div style={{ fontSize: "14px", color: "var(--text-muted)" }}>
             Decode headers, claims, and timestamps - then send it to any exploit page.
           </div>
         </div>
         <Link
-          href="/inspect"
+          href="/debug"
           style={{
             display: "inline-flex",
             alignItems: "center",
@@ -319,7 +319,7 @@ export default function HomePage() {
             boxShadow: "0 0 16px var(--accent-border)",
           }}
         >
-          Open Inspector <Icon.ChevronRight size={14} />
+          Open Debugger <Icon.ChevronRight size={14} />
         </Link>
       </div>
     </PageContainer>

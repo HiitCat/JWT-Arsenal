@@ -20,6 +20,7 @@ const SEVERITY_ICON_BG: Record<Severity, string> = {
 
 const FINDING_EXPLOITS: Partial<Record<string, string>> = {
   "alg-none":           "/exploit/alg-none",
+  "alg-symmetric":      "/exploit/secret-bruteforce",
   "alg-confusion-risk": "/exploit/algorithm-confusion",
   "jku-present":        "/exploit/jku-injection",
   "jwk-present":        "/exploit/jwk-injection",
@@ -29,9 +30,11 @@ const FINDING_EXPLOITS: Partial<Record<string, string>> = {
 export function SecurityAnalysis({
   header,
   payload,
+  rawJwt,
 }: {
   header: Record<string, unknown>;
   payload: Record<string, unknown>;
+  rawJwt: string;
 }) {
   const findings = analyzeJwt(header, payload);
   const counts = findings.reduce((acc, f) => {
@@ -84,7 +87,7 @@ export function SecurityAnalysis({
       ) : (
         <div>
           {findings.map((f) => (
-            <FindingRow key={f.id} finding={f} />
+            <FindingRow key={f.id} finding={f} rawJwt={rawJwt} />
           ))}
         </div>
       )}
@@ -92,9 +95,10 @@ export function SecurityAnalysis({
   );
 }
 
-function FindingRow({ finding }: { finding: SecurityFinding }) {
+function FindingRow({ finding, rawJwt }: { finding: SecurityFinding; rawJwt: string }) {
   const color = SEVERITY_COLOR[finding.severity];
-  const exploitHref = FINDING_EXPLOITS[finding.id];
+  const exploitBase = FINDING_EXPLOITS[finding.id];
+  const exploitHref = exploitBase ? `${exploitBase}?jwt=${encodeURIComponent(rawJwt)}` : undefined;
   const SeverityIcon =
     finding.severity === "critical" || finding.severity === "high" ? ShieldX
     : finding.severity === "medium" ? AlertCircle

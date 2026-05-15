@@ -12,6 +12,7 @@ import s from "@/styles/layout/Sidebar.module.css";
 const exploits = [
   { href: "/exploit/unverified-signature", label: "Unverified Signature", icon: Icon.Eye,           color: TOPIC_COLORS.unverifiedSignature },
   { href: "/exploit/alg-none",             label: "Algorithm None",       icon: Icon.AlertTriangle, color: TOPIC_COLORS.algNone },
+  { href: "/exploit/secret-bruteforce",    label: "Secret Bruteforce",    icon: Icon.Hash,          color: TOPIC_COLORS.secretBruteforce },
   { href: "/exploit/algorithm-confusion",  label: "Algorithm Confusion",  icon: Icon.Zap,           color: TOPIC_COLORS.algorithmConfusion },
   { href: "/exploit/kid-injection",        label: "KID Injection",        icon: Icon.Key,           color: TOPIC_COLORS.kidInjection },
   { href: "/exploit/jwk-injection",        label: "JWK Injection",        icon: Icon.FileKey,       color: TOPIC_COLORS.jwkInjection },
@@ -66,7 +67,7 @@ export function Sidebar() {
 
       {/* Nav */}
       <nav className={s.nav}>
-        <NavItem href="/inspect" icon={Icon.Search} label="Inspect Token" isActive={isActive("/inspect")} collapsed={collapsed} />
+        <NavItem href="/debug" icon={Icon.Search} label="Debug Token" isActive={isActive("/debug")} collapsed={collapsed} />
         <div className={s.divider} />
 
         <div className={s.exploitsSection}>

@@ -9,6 +9,7 @@ export const TOPIC_COLORS = {
   jwkInjection: "#ec4899",
   jkuInjection: "#3b82f6",
   publicKeyRecovery: "#22c55e",
+  secretBruteforce:  "#f97316",
 } as const;
 
 export const SEVERITY_COLORS = {

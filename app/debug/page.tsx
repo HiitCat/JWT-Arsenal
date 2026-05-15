@@ -18,12 +18,13 @@ import { SecurityAnalysis } from "@/components/inspect/SecurityAnalysis";
 const DEFAULT_EXAMPLE = JWT_EXAMPLES.find((example) => example.alg === "HS256") ?? JWT_EXAMPLES[0];
 
 const EXPLOIT_PAGES = [
-  { href: "/exploit/unverified-signature", label: "Unverified Signature", icon: Icon.Eye, color: TOPIC_COLORS.unverifiedSignature },
-  { href: "/exploit/alg-none", label: "Algorithm None", icon: Icon.AlertTriangle, color: TOPIC_COLORS.algNone },
-  { href: "/exploit/algorithm-confusion", label: "Algorithm Confusion", icon: Icon.Zap, color: TOPIC_COLORS.algorithmConfusion },
-  { href: "/exploit/kid-injection", label: "KID Injection", icon: Icon.Key, color: TOPIC_COLORS.kidInjection },
-  { href: "/exploit/jwk-injection", label: "JWK Injection", icon: Icon.FileKey, color: TOPIC_COLORS.jwkInjection },
-  { href: "/exploit/jku-injection", label: "JKU Injection", icon: Icon.Globe, color: TOPIC_COLORS.jkuInjection },
+  { href: "/exploit/unverified-signature", label: "Unverified Signature", icon: Icon.Eye,           color: TOPIC_COLORS.unverifiedSignature },
+  { href: "/exploit/alg-none",             label: "Algorithm None",       icon: Icon.AlertTriangle, color: TOPIC_COLORS.algNone },
+  { href: "/exploit/secret-bruteforce",    label: "Secret Bruteforce",    icon: Icon.Hash,          color: TOPIC_COLORS.secretBruteforce },
+  { href: "/exploit/algorithm-confusion",  label: "Algorithm Confusion",  icon: Icon.Zap,           color: TOPIC_COLORS.algorithmConfusion },
+  { href: "/exploit/kid-injection",        label: "KID Injection",        icon: Icon.Key,           color: TOPIC_COLORS.kidInjection },
+  { href: "/exploit/jwk-injection",        label: "JWK Injection",        icon: Icon.FileKey,       color: TOPIC_COLORS.jwkInjection },
+  { href: "/exploit/jku-injection",        label: "JKU Injection",        icon: Icon.Globe,         color: TOPIC_COLORS.jkuInjection },
 ];
 
 function hexToRgb(hex: string) {
@@ -62,7 +63,7 @@ export default function InspectPage() {
       <div style={{ paddingTop: "32px" }}>
         <div style={{ marginBottom: "32px" }}>
           <h1 style={{ fontSize: "32px", fontWeight: 600, color: "var(--text)", lineHeight: 1.2, margin: "0 0 8px" }}>
-            Inspect Token
+            Debug Token
           </h1>
           <p style={{ fontSize: "16px", color: "var(--text-muted)", margin: 0 }}>
             Decode and analyze a JWT token without sending it anywhere.
@@ -178,7 +179,7 @@ export default function InspectPage() {
               </Section>
             </div>
 
-            <SecurityAnalysis header={parsed.header} payload={parsed.payload} />
+            <SecurityAnalysis header={parsed.header} payload={parsed.payload} rawJwt={rawJwt} />
 
             <div
               style={{
