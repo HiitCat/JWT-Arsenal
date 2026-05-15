@@ -8,7 +8,6 @@ import s from "@/styles/jwt/JwtOutput.module.css";
 interface JwtOutputProps {
   token: string;
   label?: string;
-  variant?: string;
 }
 
 export function JwtOutput({ token, label }: JwtOutputProps) {
