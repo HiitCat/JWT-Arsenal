@@ -89,7 +89,7 @@ JWT1="eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ1c2VyIn0.SIGNATURE1"
 JWT2="eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ1c2VyIn0.SIGNATURE2"
 
 # Run recovery (outputs recovered_key_1.pem, recovered_key_2.pem)
-python3 jwt_forgery.py "$JWT1" "$JWT2"
+python3 standalone/jwt_forgery.py "$JWT1" "$JWT2"
 
 # Test each recovered key against the server:
 # Use JWT Arsenal's Algorithm Confusion page with each PEM as the public key
