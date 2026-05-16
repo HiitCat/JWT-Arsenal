@@ -1,17 +1,11 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import {
-  SignJWT,
-  exportPKCS8,
-  exportSPKI,
-  generateKeyPair,
-} from "jose";
+import { exportPKCS8, exportSPKI, generateKeyPair } from "jose";
 
 const payload = {
   sub: "user_42",
   username: "alice",
   role: "user",
-  iat: 1700000000,
 };
 
 const hmacSecrets = {
@@ -32,30 +26,10 @@ function formatObject(value, indent = 2) {
   return JSON.stringify(value, null, indent);
 }
 
-async function createNoneToken() {
-  return `${encodeBase64UrlJson({ alg: "none", typ: "JWT" })}.${encodeBase64UrlJson(payload)}.`;
-}
-
 async function createHmacExample(alg) {
-  const secret = new TextEncoder().encode(hmacSecrets[alg]);
-
-  // Re-import the intended UTF-8 demo secret so the inspect page can verify it directly.
-  const importedKey = await crypto.subtle.importKey(
-    "raw",
-    secret,
-    { name: "HMAC", hash: alg.replace("HS", "SHA-") },
-    false,
-    ["sign"]
-  );
-
-  const token = await new SignJWT(payload)
-    .setProtectedHeader({ alg, typ: "JWT" })
-    .sign(importedKey);
-
   return {
     label: alg,
     alg,
-    token,
     secret: hmacSecrets[alg],
   };
 }
@@ -65,14 +39,10 @@ async function createKeyPairExample(alg, options) {
     ...options,
     extractable: true,
   });
-  const token = await new SignJWT(payload)
-    .setProtectedHeader({ alg, typ: "JWT" })
-    .sign(privateKey);
 
   return {
     label: alg,
     alg,
-    token,
     publicKey: await exportSPKI(publicKey),
     privateKey: await exportPKCS8(privateKey),
   };
@@ -80,12 +50,7 @@ async function createKeyPairExample(alg, options) {
 
 async function main() {
   const examples = [
-    {
-      label: "none",
-      alg: "none",
-      token: await createNoneToken(),
-      category: "unsigned",
-    },
+    { label: "none", alg: "none", category: "unsigned" },
     { ...(await createHmacExample("HS256")), category: "hmac" },
     { ...(await createHmacExample("HS384")), category: "hmac" },
     { ...(await createHmacExample("HS512")), category: "hmac" },

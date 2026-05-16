@@ -9,12 +9,12 @@ import { JsonEditor } from "@/components/jwt/JsonEditor";
 import { Icon } from "@/components/shared/Icons";
 import { JwtParts, formatTimestamp, isExpired, STANDARD_CLAIMS, encodeJwt, decodeJwt } from "@/lib/jwt";
 import { verifyHmacSignature, signHmac, verifyAsymmetricSignature, importJwkAsPem } from "@/lib/crypto";
-import { JWT_EXAMPLES } from "@/lib/jwtExamples";
+import { JWT_EXAMPLE_CONFIGS, generateExampleToken } from "@/lib/jwtExamples";
 import { TOPIC_COLORS, JWT_PART_COLORS } from "@/lib/colors";
 import { Mono } from "@/components/shared/Mono";
 import { SecurityAnalysis } from "@/components/inspect/SecurityAnalysis";
 
-const DEFAULT_EXAMPLE = JWT_EXAMPLES.find((example) => example.alg === "HS256") ?? JWT_EXAMPLES[0];
+const DEFAULT_EXAMPLE = JWT_EXAMPLE_CONFIGS.find((example) => example.alg === "HS256") ?? JWT_EXAMPLE_CONFIGS[0];
 
 const EXPLOIT_PAGES = [
   { href: "/exploit/unverified-signature", label: "Unverified Signature", icon: Icon.Eye,           color: TOPIC_COLORS.unverifiedSignature },
@@ -34,7 +34,7 @@ function hexToRgb(hex: string) {
 }
 
 export default function InspectPage() {
-  const [rawJwt, setRawJwt] = useState(DEFAULT_EXAMPLE.token);
+  const [rawJwt, setRawJwt] = useState("");
   const [secret, setSecret] = useState(DEFAULT_EXAMPLE.secret ?? "");
   const [publicKey, setPublicKey] = useState(DEFAULT_EXAMPLE.publicKey ?? "");
   const [selectedExample, setSelectedExample] = useState(DEFAULT_EXAMPLE.label);
@@ -44,20 +44,11 @@ export default function InspectPage() {
   const [headerError, setHeaderError] = useState<string | null>(null);
   const [payloadError, setPayloadError] = useState<string | null>(null);
 
-  // editorReset tracks external JWT changes so editors remount with correct initialValue.
-  // We pre-decode synchronously to avoid timing issues with async state updates.
   const [editorReset, setEditorReset] = useState<{
     key: number;
     header: Record<string, unknown>;
     payload: Record<string, unknown>;
-  }>(() => {
-    try {
-      const parts = decodeJwt(DEFAULT_EXAMPLE.token);
-      return { key: 0, header: parts.header, payload: parts.payload };
-    } catch {
-      return { key: 0, header: {}, payload: {} };
-    }
-  });
+  }>({ key: 0, header: {}, payload: {} });
 
   const handleParsed = useCallback((parts: JwtParts | null) => {
     setParsed(parts);
@@ -71,6 +62,10 @@ export default function InspectPage() {
     } catch { /* invalid JWT, keep current editors */ }
   }, []);
 
+  useEffect(() => {
+    generateExampleToken(DEFAULT_EXAMPLE).then(updateJwtAndEditors);
+  }, [updateJwtAndEditors]);
+
   // Called when the user pastes a token directly - clears the public key
   const handleExternalJwtChange = useCallback((token: string) => {
     setPublicKey("");
@@ -78,12 +73,12 @@ export default function InspectPage() {
   }, [updateJwtAndEditors]);
 
   const handleExampleChange = useCallback((label: string) => {
-    const example = JWT_EXAMPLES.find((candidate) => candidate.label === label);
+    const example = JWT_EXAMPLE_CONFIGS.find((candidate) => candidate.label === label);
     if (!example) return;
     setSelectedExample(example.label);
     setSecret(example.secret ?? "");
     setPublicKey(example.publicKey ?? "");
-    updateJwtAndEditors(example.token);
+    generateExampleToken(example).then(updateJwtAndEditors);
   }, [updateJwtAndEditors]);
 
   const handleHeaderChange = useCallback((newHeader: Record<string, unknown>) => {
@@ -150,7 +145,7 @@ export default function InspectPage() {
                   outline: "none",
                 }}
               >
-                {JWT_EXAMPLES.map((example) => (
+                {JWT_EXAMPLE_CONFIGS.map((example) => (
                   <option key={example.label} value={example.label}>
                     {example.label}
                   </option>
