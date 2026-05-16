@@ -86,7 +86,7 @@ async function verifyToken(token) {
   return result.payload;
 }`} />
 
-      <InfoCallout variant="danger" title="Cisco Security Advisory cisco-sa-20190513-securelogin">
+      <InfoCallout variant="warning" title="Cisco Security Advisory cisco-sa-20190513-securelogin">
         CVE-2018-0114 affected Cisco products using node-jose as their JOSE implementation.
         This included authentication components in Cisco products that accepted self-signed JWTs.
         The advisory rated it Critical (CVSS 10.0 in some configurations) as it allowed

@@ -616,7 +616,7 @@ function SignatureVerifier({
         <span style={{ color: "var(--text-muted)" }}>{algFnName}(</span>
         <div style={{ paddingLeft: "14px" }}>
           <span style={{ color: JWT_PART_COLORS.header }}>base64UrlEncode(header)</span>
-          <span style={{ color: "var(--text-muted)" }}> + &quot;.&quot; +</span>
+          <span style={{ color: "var(--text-muted)" }}> + "." +</span>
           <br />
           <span style={{ color: JWT_PART_COLORS.payload }}>base64UrlEncode(payload)</span>
           <span style={{ color: "var(--text-muted)" }}>,</span>

@@ -122,7 +122,7 @@ jku = "https://kubernetes.default.svc/api/v1/"
 # Internal Redis (non-HTTP response → parse error, but confirms SSRF)
 jku = "http://internal-redis:6379/"`} />
 
-      <InfoCallout variant="warning" title="Server-side request requirements">
+      <InfoCallout variant="info" title="Server-side request requirements">
         This attack requires the vulnerable server to make outbound HTTP requests.
         Environments with strict egress filtering (no internet from the server) are not directly vulnerable
         to the basic variant - but SSRF to internal hosts may still work.
@@ -138,12 +138,12 @@ jku = "http://internal-redis:6379/"`} />
         <li><strong style={{ color: "var(--text)" }}>Burp Collaborator</strong> - confirms server-side DNS/HTTP requests for out-of-band validation</li>
       </ul>
 
-      <ImpactBox title="Bug bounty cases">
+      <ImpactBox title="Where to look">
         <ul className="refs-list" style={{ lineHeight: 2 }}>
-          <li>Exploited in multiple OAuth 2.0 and OIDC providers where the JWS library fetched <Mono>jku</Mono> without domain allowlist enforcement</li>
-          <li>Open redirect chains have been used to bypass domain restrictions in production identity providers</li>
-          <li>Combined with SSRF to pivot to AWS IMDS and retrieve temporary credentials - chained to full AWS account compromise</li>
-          <li>GitHub Security Lab and PortSwigger researchers have demonstrated practical exploitation against real identity providers</li>
+          <li>OAuth 2.0 and OIDC libraries that support dynamic key discovery - check if <Mono>jku</Mono> is accepted and fetched without a domain allowlist</li>
+          <li>Identity providers that validate the domain but not the full path - an open redirect on the trusted domain can be enough to bypass the check</li>
+          <li>Any server-side <Mono>jku</Mono> fetch is also an SSRF vector: AWS IMDS (<Mono>169.254.169.254</Mono>), internal APIs, and metadata endpoints are common pivot targets</li>
+          <li>B2B SaaS with per-tenant key endpoints - tenant isolation logic often introduces <Mono>jku</Mono> fetches without strict origin validation</li>
         </ul>
       </ImpactBox>
 

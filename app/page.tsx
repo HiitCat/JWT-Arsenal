@@ -6,6 +6,7 @@ import { PageContainer } from "@/components/layout/PageContainer";
 import { GlowCard, hexToRgb } from "@/components/shared/GlowCard";
 import { Link } from "@/components/shared/Link";
 import { TOPIC_COLORS } from "@/lib/colors";
+import s from "@/styles/home.module.css";
 
 const techniques = [
   {
@@ -100,21 +101,7 @@ export default function HomePage() {
           </span>
         </h1>
 
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "6px",
-            padding: "4px 12px",
-            background: "var(--success-tint)",
-            border: "1px solid var(--success-border)",
-            borderRadius: "100px",
-            fontSize: "12px",
-            color: "var(--success)",
-            fontWeight: 500,
-            marginBottom: "16px",
-          }}
-        >
+        <div className={s.badge}>
           <Icon.Lock size={11} />
           100% client-side · No data leaves your browser
         </div>

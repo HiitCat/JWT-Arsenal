@@ -26,7 +26,7 @@ export default function Page() {
         The server, not enforcing its expected algorithm, then verifies the HMAC using the same public key
         - and it matches.
       </P>
-      <InfoCallout variant="danger" title="The public key is supposed to be public">
+      <InfoCallout variant="warning" title="The public key is supposed to be public">
         The entire point of asymmetric cryptography is that the public key can be freely distributed.
         Algorithm confusion turns this design property into a vulnerability - the attacker knows the
         "secret" used for verification by definition.
@@ -143,12 +143,12 @@ const decoded = jwt.verify(token, publicKey);
   issuer:     'auth.example.com',
 });`} />
 
-      <ImpactBox title="Real-world cases">
+      <ImpactBox title="Context">
         <ul className="refs-list" style={{ lineHeight: 2 }}>
-          <li>Auth0 and Okta confirmed real production deployments were vulnerable before the 2015 coordinated disclosure</li>
-          <li>PortSwigger Research (2022) demonstrated practical exploitation against modern libraries still lacking strict algorithm enforcement</li>
-          <li>Multiple bug bounty reports on HackerOne targeting SSO integrations and API gateway products</li>
-          <li>Particularly impactful in OAuth 2.0 / OIDC deployments where the public key is published by design</li>
+          <li>The 2015 coordinated disclosure by Tim McLean affected Auth0, Okta, and multiple JWT libraries that accepted the algorithm from the token header without enforcement</li>
+          <li>PortSwigger Research published a detailed breakdown of the attack in 2022 - the References section links to it</li>
+          <li>Most impactful in OAuth 2.0 / OIDC deployments: the public key is published by design (JWKS endpoint), removing the need to exfiltrate anything</li>
+          <li>Still relevant: libraries that implement <Mono>allowedAlgorithms</Mono> but default to allowing all are common in older Node.js and Java stacks</li>
         </ul>
       </ImpactBox>
 

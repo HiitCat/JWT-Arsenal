@@ -5,6 +5,7 @@ import { Link } from "@/components/shared/Link";
 import { Icon } from "@/components/shared/Icons";
 import { analyzeJwt, type SecurityFinding, type Severity } from "@/lib/securityAnalysis";
 import { SEVERITY_COLORS } from "@/lib/colors";
+import s from "@/styles/inspect/SecurityAnalysis.module.css";
 
 const SEVERITY_COLOR: Record<Severity, string> = SEVERITY_COLORS;
 
@@ -43,16 +44,8 @@ export function SecurityAnalysis({
   }, {} as Partial<Record<Severity, number>>);
 
   return (
-    <div
-      style={{
-        background: "var(--bg-elevated)",
-        border: "1px solid var(--border)",
-        borderRadius: "var(--radius)",
-        overflow: "hidden",
-        marginBottom: "16px",
-      }}
-    >
-      <div style={{ padding: "10px 16px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
+    <div className={s.wrapper}>
+      <div className={s.header}>
         <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--text-muted)", letterSpacing: "0.05em", textTransform: "uppercase" }}>
           Security Analysis
         </span>
@@ -81,7 +74,7 @@ export function SecurityAnalysis({
         <div style={{ padding: "20px 16px", display: "flex", alignItems: "center", gap: "10px" }}>
           <ShieldCheck size={16} color="var(--success)" />
           <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>
-            No obvious vulnerabilities detected in this token&apos;s header or payload.
+            No obvious vulnerabilities detected in this token's header or payload.
           </span>
         </div>
       ) : (
@@ -106,22 +99,21 @@ function FindingRow({ finding, rawJwt }: { finding: SecurityFinding; rawJwt: str
     : Info;
 
   return (
-    <div style={{
-      borderLeft: `3px solid ${color}`,
-      borderBottom: "1px solid rgba(255,255,255,0.05)",
-      background: `${color}${SEVERITY_ROW_BG[finding.severity]}`,
-      padding: "11px 16px",
-      display: "flex",
-      gap: "12px",
-      alignItems: "center",
-    }}>
-      <div style={{
-        width: "34px", height: "34px", borderRadius: "50%",
-        background: `${color}${SEVERITY_ICON_BG[finding.severity]}`,
-        border: `1px solid ${color}35`,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        flexShrink: 0, color,
-      }}>
+    <div
+      className={s.findingRow}
+      style={{
+        borderLeft: `3px solid ${color}`,
+        background: `${color}${SEVERITY_ROW_BG[finding.severity]}`,
+      }}
+    >
+      <div
+        className={s.findingIcon}
+        style={{
+          background: `${color}${SEVERITY_ICON_BG[finding.severity]}`,
+          border: `1px solid ${color}35`,
+          color,
+        }}
+      >
         <SeverityIcon size={17} />
       </div>
 

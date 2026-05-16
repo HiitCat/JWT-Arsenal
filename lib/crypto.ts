@@ -8,6 +8,13 @@ function selectHashAlgorithm(alg: string): AlgorithmIdentifier {
   return "SHA-256";
 }
 
+// WebCrypto rejects empty keys; pad to SHA-256 block size (64 bytes)
+function toHmacKeyBuffer(secretBytes: Uint8Array): ArrayBuffer {
+  return secretBytes.byteLength === 0
+    ? new Uint8Array(64).buffer
+    : secretBytes.buffer.slice(secretBytes.byteOffset, secretBytes.byteOffset + secretBytes.byteLength) as ArrayBuffer;
+}
+
 export interface RsaKeyPair {
   publicKey: CryptoKey;
   privateKey: CryptoKey;
@@ -43,10 +50,7 @@ export async function generateRsaKeyPair(): Promise<RsaKeyPair> {
 }
 
 export async function signHmacSha256(data: string, keyBytes: Uint8Array): Promise<Uint8Array> {
-  // WebCrypto rejects empty keys; HMAC pads keys shorter than block size with zeros (64 bytes for SHA-256)
-  const keyData = keyBytes.byteLength === 0
-    ? new Uint8Array(64).buffer
-    : keyBytes.buffer.slice(keyBytes.byteOffset, keyBytes.byteOffset + keyBytes.byteLength) as ArrayBuffer;
+  const keyData = toHmacKeyBuffer(keyBytes);
   const key = await crypto.subtle.importKey(
     "raw",
     keyData,
@@ -126,12 +130,9 @@ export async function importRsaPrivateKeyFromJwk(jwk: JsonWebKey): Promise<Crypt
 }
 
 export function derToPem(der: ArrayBuffer, label: string): string {
-  const bytes = new Uint8Array(der);
-  let binary = "";
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  const base64 = btoa(binary);
+  // base64url -> standard base64 (re-add padding stripped by base64UrlEncodeBytes)
+  const b64url = base64UrlEncodeBytes(new Uint8Array(der));
+  const base64 = (b64url + "=".repeat((4 - b64url.length % 4) % 4)).replace(/-/g, "+").replace(/_/g, "/");
   const lines = base64.match(/.{1,64}/g) ?? [];
   return `-----BEGIN ${label}-----\n${lines.join("\n")}\n-----END ${label}-----\n`;
 }
@@ -141,12 +142,10 @@ export function pemToDer(pem: string): ArrayBuffer {
     .replace(/-----BEGIN [^-]+-----/g, "")
     .replace(/-----END [^-]+-----/g, "")
     .replace(/\s/g, "");
-  const binary = atob(base64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-  return bytes.buffer;
+  // standard base64 -> base64url so base64UrlDecodeBytes can handle it
+  const b64url = base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+  const bytes = base64UrlDecodeBytes(b64url);
+  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
 }
 
 export async function publicKeyJwkFromPem(pem: string): Promise<JsonWebKey> {
@@ -265,10 +264,7 @@ export async function signHmac(
   alg: string
 ): Promise<string> {
   const hashAlg = selectHashAlgorithm(alg);
-  const keyMaterial = secretBytes.byteLength === 0
-    ? new Uint8Array(64).buffer
-    : secretBytes.buffer.slice(secretBytes.byteOffset, secretBytes.byteOffset + secretBytes.byteLength) as ArrayBuffer;
-  const key = await crypto.subtle.importKey("raw", keyMaterial, { name: "HMAC", hash: hashAlg }, false, ["sign"]);
+  const key = await crypto.subtle.importKey("raw", toHmacKeyBuffer(secretBytes), { name: "HMAC", hash: hashAlg }, false, ["sign"]);
   const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(`${rawHeader}.${rawPayload}`));
   return base64UrlEncodeBytes(new Uint8Array(sig));
 }
@@ -282,14 +278,9 @@ export async function verifyHmacSignature(
   alg: string
 ): Promise<boolean> {
   const hashAlg = selectHashAlgorithm(alg);
-
-  const keyMaterial = secretBytes.byteLength === 0
-    ? new Uint8Array(64).buffer
-    : secretBytes.buffer.slice(secretBytes.byteOffset, secretBytes.byteOffset + secretBytes.byteLength) as ArrayBuffer;
-
   const key = await crypto.subtle.importKey(
     "raw",
-    keyMaterial,
+    toHmacKeyBuffer(secretBytes),
     { name: "HMAC", hash: hashAlg },
     false,
     ["sign"]

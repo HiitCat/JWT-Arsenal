@@ -129,12 +129,12 @@ payload = jwt.decode(token, key, algorithms=[])  # empty list bypasses check`} /
         to prevent a security bypass is not a defence.
       </P>
 
-      <ImpactBox title="Coordinated disclosure - 2015">
+      <ImpactBox title="2015 coordinated disclosure - Tim McLean">
         <ul className="refs-list" style={{ lineHeight: 2 }}>
-          <li>Auth0 security bulletin documented bypasses in 8 libraries simultaneously</li>
-          <li>Case-variation bypasses survived in some libraries for months after the initial patch</li>
-          <li>Libraries that check <Mono>alg !== "none"</Mono> (case-sensitive) remain vulnerable to <Mono>None</Mono> / <Mono>NONE</Mono></li>
-          <li>Still found in CTF challenges and legacy codebases using pinned old library versions</li>
+          <li>Tim McLean's research documented bypasses in 8 major JWT libraries simultaneously - the References section links to the original post</li>
+          <li>Case-variation bypasses (<Mono>None</Mono>, <Mono>NONE</Mono>) survived in several libraries for months after the initial patch</li>
+          <li>Still found in CTF challenges and codebases pinned to pre-2015 library versions</li>
+          <li>Modern libraries reject <Mono>alg: none</Mono> by default - but only if the caller passes an explicit algorithm allowlist</li>
         </ul>
       </ImpactBox>
 
@@ -153,7 +153,7 @@ payload = jwt.decode(token, key, algorithms=[])  # empty list bypasses check`} /
           <li><Ref href="https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/">Auth0 - Critical vulnerabilities in JWT libraries (2015)</Ref></li>
           <li><Ref href="https://portswigger.net/web-security/jwt/exploiting#accepting-tokens-with-no-signature">PortSwigger - Accepting tokens with no signature</Ref></li>
           <li><Ref href="https://www.rfc-editor.org/rfc/rfc7518#section-3.6">RFC 7518 §3.6 - The "none" algorithm</Ref></li>
-          <li><Ref href="https://www.nist.gov/publications/recommendation-pair-wise-key-establishment-schemes-using-discrete-logarithm">Tim McLean - Attacking JSON Web Tokens (original research)</Ref></li>
+          <li><Ref href="https://www.chosenplaintext.ca/2015/03/31/jwt-algorithm-confusion.html">Tim McLean - Attacking JSON Web Tokens (2015)</Ref></li>
         </ul>
       </div>
 

@@ -133,12 +133,12 @@ print(forged)
 # Send to server. If 200 → unverified signature.
 # If 401 → server validates signatures (good).`} />
 
-      <ImpactBox title="Real-world impact">
+      <ImpactBox title="Where to look">
         <ul className="refs-list" style={{ lineHeight: 2 }}>
-          <li>Reported on HackerOne with payouts ranging $500-$25,000 depending on impact scope</li>
-          <li>Most critical when <Mono>role</Mono>, <Mono>admin</Mono>, or <Mono>permissions</Mono> claims control authorization decisions</li>
-          <li>Common in internal tooling built quickly without security review, then exposed via developer portals</li>
-          <li>Node.js <Mono>jsonwebtoken</Mono>: easy to call <Mono>decode()</Mono> vs <Mono>verify()</Mono> - accounts for the majority of bug reports in this category</li>
+          <li>Most critical when <Mono>role</Mono>, <Mono>admin</Mono>, or <Mono>permissions</Mono> claims directly control authorization - escalation is trivial</li>
+          <li>Internal tooling and developer portals built quickly: signature verification is often skipped entirely in early iterations and never revisited</li>
+          <li>Node.js with <Mono>jsonwebtoken</Mono>: <Mono>decode()</Mono> and <Mono>verify()</Mono> both exist, and it is easy to call the wrong one - fuzz with a modified token and watch for a 200</li>
+          <li>Microservices that trust tokens forwarded by an API gateway: the gateway verifies, the downstream service often does not</li>
         </ul>
       </ImpactBox>
 

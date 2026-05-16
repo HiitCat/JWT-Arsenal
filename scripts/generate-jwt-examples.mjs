@@ -8,16 +8,16 @@ import {
 } from "jose";
 
 const payload = {
-  sub: "1234567890",
-  name: "John Doe",
-  admin: true,
-  iat: 1516239022,
+  sub: "user_42",
+  username: "alice",
+  role: "user",
+  iat: 1700000000,
 };
 
 const hmacSecrets = {
-  HS256: "my-hs256-secret",
-  HS384: "my-hs384-secret",
-  HS512: "my-hs512-secret",
+  HS256: "arsenal-hs256-secret",
+  HS384: "arsenal-hs384-secret",
+  HS512: "arsenal-hs512-secret",
 };
 
 function encodeBase64UrlJson(value) {

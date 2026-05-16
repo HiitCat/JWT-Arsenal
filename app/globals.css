@@ -51,10 +51,10 @@
   --danger-border:        rgba(239, 68, 68, 0.18);
   --danger-border-strong: rgba(239, 68, 68, 0.25);
 
-  /* ── Info (violet #7c5cff) ───────────────────────────── */
-  --info: #7c5cff;
-  --info-tint:   rgba(124, 92, 255, 0.08);
-  --info-border: rgba(124, 92, 255, 0.25);
+  /* ── Info (cyan #22d3ee) ────────────────────────────── */
+  --info: #22d3ee;
+  --info-tint:   rgba(34, 211, 238, 0.07);
+  --info-border: rgba(34, 211, 238, 0.22);
 
   /* ── Surface overlays (white-on-dark) ────────────────── */
   --surface-overlay:       rgba(255, 255, 255, 0.02);
