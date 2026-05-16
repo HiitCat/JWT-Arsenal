@@ -60,17 +60,31 @@ export function KbArticle({ slug, children }: KbArticleProps) {
             </div>
             <h1 className={s.articleTitle} style={{ color: topic.color }}>{topic.title}</h1>
           </div>
-          <p className={s.articleDesc}>{topic.description}</p>
-          <div className={s.articleActions}>
-            {topic.exploitHref && (
-              <Link href={topic.exploitHref} variant="unstyled" className={clsx(s.actionBtn, s.actionBtnAccent)}>
-                <Icon.Wand size={11} /> Open exploit tool
-              </Link>
-            )}
-            {topic.labPath && (
-              <Link href={`${LAB_BASE}/${topic.labPath}`} variant="unstyled" className={clsx(s.actionBtn, s.actionBtnMuted)}>
-                <Icon.FlaskConical size={11} /> {topic.labName}
-              </Link>
+          <div className={s.articleDescRow}>
+            <p className={s.articleDesc}>{topic.description}</p>
+            {(topic.exploitHref || topic.labPath) && (
+              <div className={s.articleActions}>
+                {topic.exploitHref && (
+                  <Link href={topic.exploitHref} variant="unstyled" className={clsx(s.actionBtn, s.actionBtnAccent)} style={{ background: `${topic.color}18`, borderColor: `${topic.color}55`, color: topic.color }}>
+                    <Icon.Wand size={13} />
+                    <span className={s.actionBtnLabel}>
+                      <span className={s.actionBtnKind}>Exploit tool</span>
+                      <span className={s.actionBtnName}>Try the exploit</span>
+                    </span>
+                    <span className={s.actionBtnArrow}>→</span>
+                  </Link>
+                )}
+                {topic.labPath && (
+                  <Link href={`${LAB_BASE}/${topic.labPath}`} variant="unstyled" className={clsx(s.actionBtn, s.actionBtnMuted)}>
+                    <Icon.FlaskConical size={13} />
+                    <span className={s.actionBtnLabel}>
+                      <span className={s.actionBtnKind}>Lab CTF</span>
+                      <span className={s.actionBtnName}>{topic.labName}</span>
+                    </span>
+                    <span className={s.actionBtnArrow}>→</span>
+                  </Link>
+                )}
+              </div>
             )}
           </div>
         </div>

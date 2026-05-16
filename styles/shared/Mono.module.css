@@ -1,8 +1,8 @@
 .mono {
   font-family: var(--font-mono);
   font-size: 13px;
-  color: var(--accent);
-  background: var(--accent-faint);
+  color: var(--topic-color, var(--accent));
+  background: color-mix(in srgb, var(--topic-color, var(--accent)) 10%, transparent);
   padding: 1px 5px;
   border-radius: 4px;
 }

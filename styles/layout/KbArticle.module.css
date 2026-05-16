@@ -48,38 +48,73 @@
   line-height: 1.2;
 }
 
+.articleDescRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 0;
+}
+
 .articleDesc {
   font-size: 16px;
   color: var(--text-muted);
   line-height: 1.7;
-  margin: 0 0 20px;
-  max-width: 680px;
+  margin: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .articleActions {
   display: flex;
+  flex-direction: row;
   gap: 8px;
-  flex-wrap: wrap;
+  flex-shrink: 0;
+  align-items: flex-start;
 }
 
 .actionBtn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  height: 32px;
-  padding: 0 12px;
+  gap: 8px;
+  padding: 8px 12px;
   border-radius: var(--radius);
   text-decoration: none;
   font-size: 12px;
   font-weight: 500;
   border-width: 1px;
   border-style: solid;
+  transition: border-color 0.15s, background 0.15s;
 }
 
-.actionBtnAccent {
-  background: var(--accent-tint);
-  border-color: var(--accent-border-mid);
-  color: var(--accent);
+.actionBtnLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.actionBtnKind {
+  font-size: 10px;
+  font-weight: 400;
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.actionBtnName {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.actionBtnArrow {
+  margin-left: auto;
+  font-size: 13px;
+  opacity: 0.5;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.actionBtnAccent:hover .actionBtnArrow {
+  opacity: 1;
+  transform: translateX(2px);
 }
 
 .actionBtnMuted {
@@ -88,12 +123,23 @@
   color: var(--text-muted);
 }
 
+.actionBtnMuted:hover {
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+
+.actionBtnMuted:hover .actionBtnArrow {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
 .articleBody {
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 32px;
   margin-bottom: 40px;
+  --list-marker-color: var(--topic-color, var(--accent));
 }
 
 .nav {

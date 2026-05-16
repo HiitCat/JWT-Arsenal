@@ -22,7 +22,7 @@ export function Link({
 }: LinkProps) {
   const isExternal = external ?? /^[a-z][a-z\d+.-]*:/.test(href);
   const linkStyle = variant === "inline"
-    ? { color: "var(--accent)", display: "inline-flex", alignItems: "center", gap: "4px", ...style }
+    ? { color: "var(--topic-color, var(--accent))", display: "inline-flex", alignItems: "center", gap: "4px", ...style }
     : style;
 
   if (!isExternal) {
