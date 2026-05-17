@@ -87,12 +87,82 @@
   --font-sans: "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", monospace;
 
+  /* ── Code block background (stays dark in light mode) ── */
+  --code-bg: var(--bg);
+  --code-bg-elevated: var(--bg-elevated);
+
   /* ── Layout ──────────────────────────────────────────── */
   --radius: 8px;
   --sidebar-width: 256px;
   --container-max: 1200px;
   --container-article-max: 1100px;
   --container-px: 32px;
+}
+
+[data-theme="light"] {
+  /* ── Backgrounds ─────────────────────────────────────── */
+  --bg: #eceef2;
+  --bg-elevated: #f7f8fa;
+
+  /* ── Borders ─────────────────────────────────────────── */
+  --border: #c8cbd5;
+  --border-hover: #9fa4b4;
+
+  /* ── Text ────────────────────────────────────────────── */
+  --text: #0d0d14;
+  --text-muted: #4f5060;
+
+  /* ── Logo gradient (dark start so "JWT" is visible) ─── */
+  --gradient-logo: linear-gradient(135deg, #1a1a2e 0%, #4a7c10 50%, #84cc16 100%);
+
+  /* ── Accent tints (lime on light) ───────────────────── */
+  --accent-subtle:       rgba(132, 204, 22, 0.05);
+  --accent-bg:           rgba(132, 204, 22, 0.07);
+  --accent-faint:        rgba(132, 204, 22, 0.10);
+  --accent-tint:         rgba(132, 204, 22, 0.12);
+  --accent-tint-strong:  rgba(132, 204, 22, 0.16);
+  --accent-glow:         rgba(132, 204, 22, 0.18);
+  --accent-border:       rgba(132, 204, 22, 0.25);
+  --accent-border-mid:   rgba(132, 204, 22, 0.30);
+  --accent-border-soft:  rgba(132, 204, 22, 0.35);
+  --accent-border-hover: rgba(132, 204, 22, 0.50);
+
+  /* ── Semantic tints ──────────────────────────────────── */
+  --success-tint:   rgba(34, 197, 94, 0.10);
+  --success-glow:   rgba(34, 197, 94, 0.14);
+  --success-border: rgba(34, 197, 94, 0.30);
+  --warning-tint:   rgba(245, 158, 11, 0.08);
+  --warning-border: rgba(245, 158, 11, 0.28);
+  --danger-tint:          rgba(239, 68, 68, 0.08);
+  --danger-border:        rgba(239, 68, 68, 0.22);
+  --danger-border-strong: rgba(239, 68, 68, 0.30);
+  --info-tint:   rgba(34, 211, 238, 0.07);
+  --info-border: rgba(34, 211, 238, 0.25);
+
+  /* ── Surface overlays (black-on-light) ───────────────── */
+  --surface-overlay:       rgba(0, 0, 0, 0.03);
+  --surface-overlay-hover: rgba(0, 0, 0, 0.06);
+
+  /* ── JWT part colors ─────────────────────────────────── */
+  --jwt-dot: rgba(0, 0, 0, 0.20);
+
+  /* ── Code block background ───────────────────────────── */
+  --code-bg: #eceef2;
+  --code-bg-elevated: #e2e5eb;
+
+  /* ── Syntax highlighting (light) ─────────────────────── */
+  --syntax-comment:     #6b7280;
+  --syntax-string:      #15803d;
+  --syntax-url:         #0e7490;
+  --syntax-flag:        #b45309;
+  --syntax-command:     #6d28d9;
+  --syntax-keyword:     #1d4ed8;
+  --syntax-number:      #c2410c;
+  --syntax-operator:    #6b7280;
+  --syntax-key:         #dc2626;
+  --syntax-punctuation: #374151;
+  --syntax-placeholder: #6b7280;
+  --syntax-default:     #1f2937;
 }
 
 * {
@@ -122,6 +192,7 @@ body {
   line-height: 1.5;
   margin: 0;
   padding: 0;
+  transition: background-color 0.2s, color 0.2s;
 }
 
 *:focus-visible {

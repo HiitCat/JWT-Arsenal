@@ -1,0 +1,99 @@
+.btn {
+  position: fixed;
+  top: 14px;
+  right: 16px;
+  z-index: 200;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.2s, background 0.2s;
+  padding: 0;
+}
+
+.btn:hover {
+  border-color: var(--border-hover);
+}
+
+.track {
+  position: relative;
+  width: 16px;
+  height: 16px;
+}
+
+/*
+  Pivot = bottom-center of the button.
+  In icon-local coords (icon 16x16 inside 36x36 button, offset (10,10)):
+    bottom of button = 36px from button top = 36 - 10 = 26px from icon top
+    → transform-origin: 8px 26px
+
+  Orbit radius = distance(pivot → icon center) = distance((8,26)→(8,8)) = 18px.
+
+  Rotation direction: CCW (negative).
+    At 0°  : icon at button center (visible).
+    At -45°: icon at lower-right area, ~13.7px from center (visible).
+    At -90°: icon at (36,36) from button corner (~25px from center, clipped).
+
+  Initial tangent at 0° = pointing RIGHT → icon moves right first, curves down.
+*/
+
+.icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: 8px 26px;
+}
+
+.sun  { color: #f59e0b; }
+.moon { color: #94a3b8; }
+
+/* ── Resting states ─────────────────────────────────────── */
+/*
+  visible   = center (rotate 0deg)
+  hiddenArc = bottom-left (rotate -90deg) — entry position, clipped
+*/
+
+.visible   { transform: rotate(0deg);   }
+.hiddenArc { transform: rotate(-90deg); }
+
+/* ── Arc animations ─────────────────────────────────────── */
+
+.exitArc {
+  animation: exitArc 0.44s ease-in forwards;
+}
+
+.enterArc {
+  animation: enterArc 0.44s ease-out forwards;
+}
+
+/* Exit: center (0deg) → bottom-right (90deg) */
+@keyframes exitArc {
+  from { transform: rotate(0deg);   }
+  to   { transform: rotate(90deg);  }
+}
+
+/* Enter: bottom-left (-90deg) → center (0deg) */
+@keyframes enterArc {
+  from { transform: rotate(-90deg); }
+  to   { transform: rotate(0deg);   }
+}
+
+/* ── Sun rays slow spin ─────────────────────────────────── */
+
+.rays {
+  transform-origin: 8px 8px;
+  animation: spinRays 12s linear infinite;
+}
+
+@keyframes spinRays {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}

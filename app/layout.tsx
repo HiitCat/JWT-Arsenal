@@ -4,6 +4,8 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { AnimatedBackground } from "@/components/layout/AnimatedBackground";
 import { GithubFab } from "@/components/layout/GithubFab";
 import { PageLoader } from "@/components/layout/PageLoader";
+import { ThemeProvider } from "@/components/layout/ThemeProvider";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, OG_IMAGE } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -197,21 +199,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}})();` }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
       <body>
-        <AnimatedBackground />
-        <div style={{ display: "flex", minHeight: "100vh", position: "relative", zIndex: 1 }}>
-          <Sidebar />
-          <div style={{ flex: 1, minWidth: 0, overflowY: "auto" }}>
-            {children}
+        <ThemeProvider>
+          <AnimatedBackground />
+          <div style={{ display: "flex", minHeight: "100vh", position: "relative", zIndex: 1 }}>
+            <Sidebar />
+            <div style={{ flex: 1, minWidth: 0, overflowY: "auto" }}>
+              {children}
+            </div>
           </div>
-        </div>
-        <GithubFab />
-        <PageLoader />
+          <ThemeToggle />
+          <GithubFab />
+          <PageLoader />
+        </ThemeProvider>
       </body>
     </html>
   );

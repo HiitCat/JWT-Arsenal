@@ -31,7 +31,7 @@
 /* ── Panel (CodeBlock, JwtOutput) ────────────────────────── */
 
 .panelWrapper {
-  background: var(--bg);
+  background: var(--code-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
@@ -43,7 +43,7 @@
   justify-content: space-between;
   padding: 8px 12px;
   border-bottom: 1px solid var(--border);
-  background: var(--surface-overlay);
+  background: var(--code-bg-elevated);
 }
 
 .panelHeaderLabel {

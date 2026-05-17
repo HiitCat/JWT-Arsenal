@@ -15,7 +15,8 @@ interface Particle {
 }
 
 const LIME = "132, 204, 22";
-const NEUTRAL = "180, 180, 195";
+const NEUTRAL_DARK = "180, 180, 195";
+const NEUTRAL_LIGHT = "80, 80, 100";
 const N = 60;
 const MAX_DIST = 140;
 const BASE_SPEED = 0.22;
@@ -53,6 +54,11 @@ export function AnimatedBackground() {
     };
 
     const draw = () => {
+      const isLight = document.documentElement.getAttribute("data-theme") === "light";
+      const NEUTRAL = isLight ? NEUTRAL_LIGHT : NEUTRAL_DARK;
+      const neutralLineFade = isLight ? 0.10 : 0.07;
+      const neutralDotAlpha = isLight ? 0.20 : 0.15;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       for (const p of particles) {
@@ -76,7 +82,7 @@ export function AnimatedBackground() {
             const fade = (1 - dist / MAX_DIST);
             const isLime = a.lime || b.lime;
             const color = isLime ? LIME : NEUTRAL;
-            const opacity = isLime ? fade * 0.18 : fade * 0.07;
+            const opacity = isLime ? fade * 0.18 : fade * neutralLineFade;
             ctx.beginPath();
             ctx.moveTo(a.x, a.y);
             ctx.lineTo(b.x, b.y);
@@ -104,7 +110,7 @@ export function AnimatedBackground() {
         ctx.arc(p.x, p.y, p.r * (p.lime ? pulseScale : 1), 0, Math.PI * 2);
         ctx.fillStyle = p.lime
           ? `rgba(${LIME}, ${0.55 + Math.sin(p.pulse) * 0.15})`
-          : `rgba(${NEUTRAL}, 0.15)`;
+          : `rgba(${NEUTRAL}, ${neutralDotAlpha})`;
         ctx.fill();
       }
 
