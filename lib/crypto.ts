@@ -269,6 +269,154 @@ export async function signHmac(
   return base64UrlEncodeBytes(new Uint8Array(sig));
 }
 
+// ── EC keypair (ES256 / P-256) ───────────────────────────────────────────────
+
+export interface EcKeyPair {
+  publicKey: CryptoKey;
+  privateKey: CryptoKey;
+  publicKeyJwk: JsonWebKey;
+  privateKeyJwk: JsonWebKey;
+  publicKeyPem: string;
+}
+
+export async function generateEcKeyPair(): Promise<EcKeyPair> {
+  const pair = await crypto.subtle.generateKey(
+    { name: "ECDSA", namedCurve: "P-256" },
+    true,
+    ["sign", "verify"]
+  );
+  const publicKeyJwk  = await crypto.subtle.exportKey("jwk", pair.publicKey);
+  const privateKeyJwk = await crypto.subtle.exportKey("jwk", pair.privateKey);
+  const publicKeyDer  = await crypto.subtle.exportKey("spki", pair.publicKey);
+  const publicKeyPem  = derToPem(publicKeyDer, "PUBLIC KEY");
+  return { publicKey: pair.publicKey, privateKey: pair.privateKey, publicKeyJwk, privateKeyJwk, publicKeyPem };
+}
+
+export async function signEs256(data: string, privateKeyJwk: JsonWebKey): Promise<Uint8Array> {
+  const key = await crypto.subtle.importKey(
+    "jwk", privateKeyJwk,
+    { name: "ECDSA", namedCurve: "P-256" },
+    false, ["sign"]
+  );
+  const sig = await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, key, new TextEncoder().encode(data));
+  return new Uint8Array(sig);
+}
+
+// ── ASN.1 DER helpers (self-signed X.509 certificate) ───────────────────────
+
+function concatU8(arrays: Uint8Array[]): Uint8Array {
+  const total = arrays.reduce((n, a) => n + a.length, 0);
+  const out = new Uint8Array(total);
+  let offset = 0;
+  for (const a of arrays) { out.set(a, offset); offset += a.length; }
+  return out;
+}
+
+function derLen(len: number): Uint8Array {
+  if (len < 128) return new Uint8Array([len]);
+  const b: number[] = [];
+  let n = len;
+  while (n > 0) { b.unshift(n & 0xff); n >>= 8; }
+  return new Uint8Array([0x80 | b.length, ...b]);
+}
+
+function tlvTag(tag: number, v: Uint8Array): Uint8Array {
+  return concatU8([new Uint8Array([tag]), derLen(v.length), v]);
+}
+
+const derSeqOf  = (parts: Uint8Array[]) => tlvTag(0x30, concatU8(parts));
+const derSetOf  = (parts: Uint8Array[]) => tlvTag(0x31, concatU8(parts));
+const derOid    = (b: number[])         => tlvTag(0x06, new Uint8Array(b));
+const derUtf8   = (s: string)           => tlvTag(0x0c, new TextEncoder().encode(s));
+const derNull   = ()                    => new Uint8Array([0x05, 0x00]);
+const derBitStr = (v: Uint8Array)       => tlvTag(0x03, concatU8([new Uint8Array([0x00]), v]));
+
+function derPosInt(b: Uint8Array): Uint8Array {
+  const v = (b[0] & 0x80) ? concatU8([new Uint8Array([0x00]), b]) : b;
+  return tlvTag(0x02, v);
+}
+
+function derSmallInt(n: number): Uint8Array {
+  return tlvTag(0x02, new Uint8Array([n]));
+}
+
+function derUtcTime(d: Date): Uint8Array {
+  const p = (n: number) => n.toString().padStart(2, "0");
+  const y = d.getUTCFullYear().toString().slice(-2);
+  const s = `${y}${p(d.getUTCMonth() + 1)}${p(d.getUTCDate())}${p(d.getUTCHours())}${p(d.getUTCMinutes())}${p(d.getUTCSeconds())}Z`;
+  return tlvTag(0x17, new TextEncoder().encode(s));
+}
+
+// sha256WithRSAEncryption  1.2.840.113549.1.1.11
+const OID_SHA256_RSA   = [0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x0b];
+// ecdsa-with-SHA256        1.2.840.10045.4.3.2
+const OID_ECDSA_SHA256 = [0x2a, 0x86, 0x48, 0xce, 0x3d, 0x04, 0x03, 0x02];
+// id-at-commonName         2.5.4.3
+const OID_CN           = [0x55, 0x04, 0x03];
+
+function certAlgId(isEc: boolean): Uint8Array {
+  // ECDSA AlgorithmIdentifier omits NULL param (RFC 5758); RSA includes it
+  return isEc
+    ? derSeqOf([derOid(OID_ECDSA_SHA256)])
+    : derSeqOf([derOid(OID_SHA256_RSA), derNull()]);
+}
+
+function certRdnName(cn: string): Uint8Array {
+  return derSeqOf([derSetOf([derSeqOf([derOid(OID_CN), derUtf8(cn)])])]);
+}
+
+// P-256 raw signature (r||s, 32 bytes each) → DER SEQUENCE { INTEGER r, INTEGER s }
+function ecRawSigToDer(raw: Uint8Array): Uint8Array {
+  return derSeqOf([derPosInt(raw.slice(0, 32)), derPosInt(raw.slice(32))]);
+}
+
+export interface CertInfo {
+  certDer: Uint8Array;
+  certPem: string;
+  certB64: string; // standard base64 (not base64url) for x5c header
+}
+
+export async function generateSelfSignedCert(
+  publicKey: CryptoKey,
+  privateKey: CryptoKey,
+  isEc: boolean,
+  cn = "attacker"
+): Promise<CertInfo> {
+  const spki   = new Uint8Array(await crypto.subtle.exportKey("spki", publicKey));
+  const now    = new Date();
+  const exp    = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
+  const serial = crypto.getRandomValues(new Uint8Array(8));
+  const alg    = certAlgId(isEc);
+  const name   = certRdnName(cn);
+
+  const tbs = derSeqOf([
+    tlvTag(0xa0, derSmallInt(2)),               // [0] version v3
+    derPosInt(serial),                           // serialNumber
+    alg,                                         // signature algorithm
+    name,                                        // issuer
+    derSeqOf([derUtcTime(now), derUtcTime(exp)]),// validity
+    name,                                        // subject
+    spki,                                        // subjectPublicKeyInfo (SPKI DER)
+  ]);
+
+  // Coerce to ArrayBuffer so WebCrypto strict typing is satisfied
+  const tbsBuf = tbs.buffer.slice(tbs.byteOffset, tbs.byteOffset + tbs.byteLength) as ArrayBuffer;
+
+  let sigVal: Uint8Array;
+  if (isEc) {
+    const raw = new Uint8Array(await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, privateKey, tbsBuf));
+    sigVal = ecRawSigToDer(raw);
+  } else {
+    sigVal = new Uint8Array(await crypto.subtle.sign("RSASSA-PKCS1-v1_5", privateKey, tbsBuf));
+  }
+
+  const certDer = derSeqOf([tbs, alg, derBitStr(sigVal)]);
+  const certB64 = btoa(Array.from(certDer, b => String.fromCharCode(b)).join(""));
+  const certPem = `-----BEGIN CERTIFICATE-----\n${certB64.match(/.{1,64}/g)!.join("\n")}\n-----END CERTIFICATE-----\n`;
+
+  return { certDer, certPem, certB64 };
+}
+
 // Verify an HMAC-signed JWT against a known secret
 export async function verifyHmacSignature(
   rawHeader: string,

